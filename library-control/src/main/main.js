@@ -1,44 +1,70 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('node:path');
-const { listarAcervo, buscarAcervo } = require('./db/acervo.repo');
-const { buscarUsuarios, listarUsuarios } = require('./db/usuarios.repo');
-const { listarEmprestimos } = require('./db/emprestimos.repo');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("node:path");
+const { listarAcervo, buscarAcervo } = require("./db/acervo.repo");
+const { buscarUsuarios, listarUsuarios } = require("./db/usuarios.repo");
+const {
+  listarEmprestimos,
+  criarEmprestimo,
+  registrarDevolucao,
+} = require("./db/emprestimos.repo");
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1400,
     height: 900,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true
-    }
+      sandbox: true,
+    },
   });
 
-  win.loadFile(path.join(__dirname, '../renderer/index.html'));
+  win.loadFile(path.join(__dirname, "../renderer/index.html"));
 }
 
 app.whenReady().then(() => {
-  ipcMain.handle('acervo:listar', () => {
+  ipcMain.handle("acervo:listar", () => {
     return listarAcervo();
   });
 
-  ipcMain.handle('acervo:buscar', (_, termo) => {
+  ipcMain.handle("acervo:buscar", (_, termo) => {
     return buscarAcervo(termo);
   });
 
-  ipcMain.handle('usuario:listar', () => {
-  return listarUsuarios();
-});
+  ipcMain.handle("usuario:listar", () => {
+    return listarUsuarios();
+  });
 
-ipcMain.handle('usuario:buscar', (_, termo) => {
-  return buscarUsuarios(termo);
-});
+  ipcMain.handle("usuario:buscar", (_, termo) => {
+    return buscarUsuarios(termo);
+  });
 
-ipcMain.handle('emprestimo:listar', () => {
-  return listarEmprestimos();
-});
+  ipcMain.handle("emprestimo:listar", () => {
+    return listarEmprestimos();
+  });
+
+  ipcMain.handle("emprestimo:criar", (_, payload) => {
+    const userId = Number(payload.userId);
+    const acervoId = Number(payload.acervoId);
+    const totalDias = Number(payload.totalDias);
+
+    if (!userId || !acervoId || !totalDias || totalDias < 1) {
+      throw new Error("Dados inválidos para criar empréstimo.");
+    }
+
+    return criarEmprestimo(userId, acervoId, totalDias);
+  });
+
+  ipcMain.handle("emprestimo:devolver", (_, id) => {
+    const emprestimoId = Number(id);
+
+    if (!emprestimoId) {
+      throw new Error("ID de empréstimo inválido.");
+    }
+
+    return registrarDevolucao(emprestimoId);
+  });
 
   createWindow();
 });

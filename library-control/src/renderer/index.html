@@ -13,6 +13,35 @@
 
       <hr />
 
+      <h2>Criar empréstimo</h2>
+
+      <div class="form-emprestimo">
+        <label for="selectUsuario">Usuário</label>
+        <select id="selectUsuario">
+          <option value="">Selecione um usuário</option>
+        </select>
+
+        <label for="selectLivro">Livro</label>
+        <select id="selectLivro">
+          <option value="">Selecione um livro</option>
+        </select>
+
+        <label for="inputDias">Quantidade de dias</label>
+        <input type="number" id="inputDias" min="1" value="7" />
+
+        <button id="btnCriarEmprestimo">Criar empréstimo</button>
+      </div>
+
+      <div id="statusEmprestimo"></div>
+
+      <hr />
+
+      <h2>Empréstimos</h2>
+      <button id="btnCarregarEmprestimos">Carregar empréstimos</button>
+      <div id="resultadoEmprestimos"></div>
+
+      <hr />
+
       <h2>Empréstimos</h2>
 
       <button id="btnCarregarEmprestimos">Carregar empréstimos</button>

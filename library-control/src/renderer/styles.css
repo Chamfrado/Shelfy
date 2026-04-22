@@ -8,3 +8,40 @@ body {
 .app {
   padding: 24px;
 }
+
+.form-emprestimo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+input,
+select,
+button {
+  padding: 8px;
+  font-size: 14px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+button {
+  cursor: pointer;
+}
+
+#statusEmprestimo {
+  margin: 12px 0;
+  font-weight: bold;
+}
