@@ -4,6 +4,7 @@ const { listarAcervo, buscarAcervo } = require("./db/acervo.repo");
 const { buscarUsuarios, listarUsuarios } = require("./db/usuarios.repo");
 const {
   listarEmprestimos,
+  listarEmprestimosAtrasados,
   criarEmprestimo,
   registrarDevolucao,
 } = require("./db/emprestimos.repo");
@@ -64,6 +65,10 @@ app.whenReady().then(() => {
     }
 
     return registrarDevolucao(emprestimoId);
+  });
+
+  ipcMain.handle("emprestimo:listar-atrasados", () => {
+    return listarEmprestimosAtrasados();
   });
 
   createWindow();

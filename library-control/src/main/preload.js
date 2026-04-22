@@ -12,4 +12,6 @@ contextBridge.exposeInMainWorld("api", {
   listarEmprestimos: () => ipcRenderer.invoke("emprestimo:listar"),
   criarEmprestimo: (payload) => ipcRenderer.invoke("emprestimo:criar", payload),
   devolverEmprestimo: (id) => ipcRenderer.invoke("emprestimo:devolver", id),
+  listarEmprestimosAtrasados: () =>
+    ipcRenderer.invoke("emprestimo:listar-atrasados"),
 });

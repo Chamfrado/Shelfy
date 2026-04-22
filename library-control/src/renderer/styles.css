@@ -45,3 +45,11 @@ button {
   margin: 12px 0;
   font-weight: bold;
 }
+
+.atrasado {
+  background: #ffe5e5;
+}
+
+.ok {
+  background: #e8f5e9;
+}

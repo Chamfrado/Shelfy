@@ -16,6 +16,8 @@ const selectLivro = document.getElementById("selectLivro");
 const inputDias = document.getElementById("inputDias");
 const btnCriarEmprestimo = document.getElementById("btnCriarEmprestimo");
 const statusEmprestimo = document.getElementById("statusEmprestimo");
+const btnCarregarAtrasados = document.getElementById("btnCarregarAtrasados");
+const resultadoAtrasadosEl = document.getElementById("resultadoAtrasados");
 
 function renderAcervo(lista) {
   resultadoEl.innerHTML = `
@@ -26,18 +28,23 @@ function renderAcervo(lista) {
         <th>Autor</th>
         <th>Editora</th>
         <th>Qtd</th>
+        <th>Status</th>
       </tr>
       ${lista
-        .map(
-          (l) => `
-        <tr>
-          <td>${l.titulo ?? ""}</td>
-          <td>${l.autor ?? ""}</td>
-          <td>${l.editora ?? ""}</td>
-          <td>${l.quantidade ?? ""}</td>
-        </tr>
-      `,
-        )
+        .map((l) => {
+          const qtd = Number(l.quantidade ?? 0);
+          const status = qtd > 0 ? "Disponível" : "Indisponível";
+
+          return `
+          <tr>
+            <td>${l.titulo ?? ""}</td>
+            <td>${l.autor ?? ""}</td>
+            <td>${l.editora ?? ""}</td>
+            <td>${qtd}</td>
+            <td>${status}</td>
+          </tr>
+        `;
+        })
         .join("")}
     </table>
   `;
@@ -121,7 +128,9 @@ function renderEmprestimos(lista) {
       try {
         const id = botao.dataset.id;
         await window.api.devolverEmprestimo(id);
+        await carregarAcervo();
         await carregarEmprestimos();
+        await carregarAtrasados();
       } catch (error) {
         console.error(error);
         statusEl.textContent = `Erro ao devolver empréstimo: ${error.message}`;
@@ -148,13 +157,15 @@ function preencherSelectLivros(lista) {
   selectLivro.innerHTML = `
     <option value="">Selecione um livro</option>
     ${lista
-      .map(
-        (livro) => `
-      <option value="${livro.id}">
-        ${livro.titulo ?? `Livro ${livro.id}`}
-      </option>
-    `,
-      )
+      .map((livro) => {
+        const qtd = Number(livro.quantidade ?? 0);
+        const indisponivel = qtd <= 0 ? "disabled" : "";
+        return `
+        <option value="${livro.id}" ${indisponivel}>
+          ${livro.titulo ?? `Livro ${livro.id}`} (${qtd} disponível)
+        </option>
+      `;
+      })
       .join("")}
   `;
 }
@@ -168,21 +179,22 @@ async function carregarInicial() {
   try {
     statusEl.textContent = "Carregando dados...";
 
-    const livros = await window.api.listarAcervo();
-    renderAcervo(livros);
-    preencherSelectLivros(livros);
-
-    const usuarios = await window.api.listarUsuarios();
-    renderUsuarios(usuarios);
-    preencherSelectUsuarios(usuarios);
-
+    await carregarAcervo();
+    await carregarUsuarios();
     await carregarEmprestimos();
+    await carregarAtrasados();
 
     statusEl.textContent = "";
   } catch (error) {
     console.error(error);
     statusEl.textContent = `Erro ao carregar dados: ${error.message}`;
   }
+}
+
+async function carregarUsuarios() {
+  const usuarios = await window.api.listarUsuarios();
+  renderUsuarios(usuarios);
+  preencherSelectUsuarios(usuarios);
 }
 
 btnBuscar.addEventListener("click", async () => {
@@ -197,6 +209,15 @@ btnBuscar.addEventListener("click", async () => {
   } catch (error) {
     console.error(error);
     statusEl.textContent = `Erro ao buscar acervo: ${error.message}`;
+  }
+});
+
+btnCarregarAtrasados.addEventListener("click", async () => {
+  try {
+    await carregarAtrasados();
+  } catch (error) {
+    console.error(error);
+    statusEl.textContent = `Erro ao carregar atrasados: ${error.message}`;
   }
 });
 
@@ -256,6 +277,13 @@ btnCriarEmprestimo.addEventListener("click", async () => {
     statusEmprestimo.textContent = "Empréstimo criado com sucesso.";
     inputDias.value = 7;
 
+    await carregarAcervo();
+    await carregarEmprestimos();
+    await carregarAtrasados();
+
+    statusEmprestimo.textContent = "Empréstimo criado com sucesso.";
+    inputDias.value = 7;
+
     await carregarEmprestimos();
   } catch (error) {
     console.error(error);
@@ -276,6 +304,43 @@ function normalizarTexto(valor) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+}
+
+function renderAtrasados(lista) {
+  resultadoAtrasadosEl.innerHTML = `
+    <h2>Atrasados - Total: ${lista.length}</h2>
+    <table>
+      <tr>
+        <th>Usuário</th>
+        <th>Livro</th>
+        <th>Data do empréstimo</th>
+        <th>Data limite</th>
+      </tr>
+      ${lista
+        .map(
+          (item) => `
+        <tr class="atrasado">
+          <td>${item.usuario ?? ""}</td>
+          <td>${item.livro ?? ""}</td>
+          <td>${item.data_atual ?? ""}</td>
+          <td>${item.data_devolucao ?? ""}</td>
+        </tr>
+      `,
+        )
+        .join("")}
+    </table>
+  `;
+}
+
+async function carregarAtrasados() {
+  const lista = await window.api.listarEmprestimosAtrasados();
+  renderAtrasados(lista);
+}
+
+async function carregarAcervo() {
+  const livros = await window.api.listarAcervo();
+  renderAcervo(livros);
+  preencherSelectLivros(livros);
 }
 
 carregarInicial();
