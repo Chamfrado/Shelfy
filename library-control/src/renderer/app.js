@@ -1,12 +1,16 @@
 const statusEl = document.getElementById('status');
+
 const resultadoEl = document.getElementById('resultado');
 const inputBusca = document.getElementById('busca');
 const btnBuscar = document.getElementById('btnBuscar');
 
-function render(lista) {
-  statusEl.textContent = '';
+const resultadoUsuariosEl = document.getElementById('resultadoUsuarios');
+const inputBuscaUsuario = document.getElementById('buscaUsuario');
+const btnBuscarUsuario = document.getElementById('btnBuscarUsuario');
+
+function renderAcervo(lista) {
   resultadoEl.innerHTML = `
-    <h2>Total: ${lista.length}</h2>
+    <h2>Acervo - Total: ${lista.length}</h2>
     <table border="1" cellpadding="8">
       <tr>
         <th>Título</th>
@@ -26,37 +30,73 @@ function render(lista) {
   `;
 }
 
+function renderUsuarios(lista) {
+  resultadoUsuariosEl.innerHTML = `
+    <h2>Usuários - Total: ${lista.length}</h2>
+    <table border="1" cellpadding="8">
+      <tr>
+        ${lista.length > 0 ? Object.keys(lista[0]).map(col => `<th>${col}</th>`).join('') : '<th>Sem dados</th>'}
+      </tr>
+      ${lista.map(usuario => `
+        <tr>
+          ${Object.values(usuario).map(valor => `<td>${valor ?? ''}</td>`).join('')}
+        </tr>
+      `).join('')}
+    </table>
+  `;
+}
+
 async function carregarInicial() {
   try {
-    statusEl.textContent = 'Carregando acervo...';
+    statusEl.textContent = 'Carregando dados...';
+
     const livros = await window.api.listarAcervo();
-    render(livros);
+    renderAcervo(livros);
+
+    const usuarios = await window.api.listarUsuarios();
+    renderUsuarios(usuarios);
+
+    statusEl.textContent = '';
   } catch (error) {
     console.error(error);
-    statusEl.textContent = 'Erro ao carregar o acervo.';
+    statusEl.textContent = `Erro ao carregar dados: ${error.message}`;
   }
 }
 
 btnBuscar.addEventListener('click', async () => {
   try {
     const termo = inputBusca.value.trim();
-    statusEl.textContent = 'Buscando...';
-
     const livros = termo
       ? await window.api.buscarAcervo(termo)
       : await window.api.listarAcervo();
 
-    render(livros);
+    renderAcervo(livros);
   } catch (error) {
     console.error(error);
-    statusEl.textContent = 'Erro ao buscar no acervo.';
+    statusEl.textContent = `Erro ao buscar acervo: ${error.message}`;
   }
 });
 
-inputBusca.addEventListener('keydown', async (event) => {
-  if (event.key === 'Enter') {
-    btnBuscar.click();
+btnBuscarUsuario.addEventListener('click', async () => {
+  try {
+    const termo = inputBuscaUsuario.value.trim();
+    const usuarios = termo
+      ? await window.api.buscarUsuarios(termo)
+      : await window.api.listarUsuarios();
+
+    renderUsuarios(usuarios);
+  } catch (error) {
+    console.error(error);
+    statusEl.textContent = `Erro ao buscar usuários: ${error.message}`;
   }
+});
+
+inputBusca.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') btnBuscar.click();
+});
+
+inputBuscaUsuario.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') btnBuscarUsuario.click();
 });
 
 carregarInicial();
