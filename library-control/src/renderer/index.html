@@ -1,17 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bibliotecário Desktop</title>
-  <link rel="stylesheet" href="./styles.css" />
-</head>
-<body>
-  <div class="app">
-    <h1>Bibliotecário Desktop</h1>
-    <p id="status">Carregando...</p>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bibliotecário Desktop</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <h1>Bibliotecário Desktop</h1>
+      <p id="status">Carregando...</p>
+      <input
+        type="text"
+        id="busca"
+        placeholder="Buscar por título ou autor..."
+      />
+      <button id="btnBuscar">Buscar</button>
 
-  <script src="../app.js"></script>
-</body>
+      <div id="resultado"></div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
 </html>
