@@ -8,6 +8,9 @@ const resultadoUsuariosEl = document.getElementById('resultadoUsuarios');
 const inputBuscaUsuario = document.getElementById('buscaUsuario');
 const btnBuscarUsuario = document.getElementById('btnBuscarUsuario');
 
+const resultadoEmprestimosEl = document.getElementById('resultadoEmprestimos');
+const btnEmprestimos = document.getElementById('btnCarregarEmprestimos');
+
 function renderAcervo(lista) {
   resultadoEl.innerHTML = `
     <h2>Acervo - Total: ${lista.length}</h2>
@@ -26,6 +29,34 @@ function renderAcervo(lista) {
           <td>${l.quantidade ?? ''}</td>
         </tr>
       `).join('')}
+    </table>
+  `;
+}
+
+function renderEmprestimos(lista) {
+  resultadoEmprestimosEl.innerHTML = `
+    <h2>Empréstimos - Total: ${lista.length}</h2>
+    <table border="1" cellpadding="8">
+      <tr>
+        <th>Usuário</th>
+        <th>Livro</th>
+        <th>Data</th>
+        <th>Devolução</th>
+        <th>Status</th>
+      </tr>
+      ${lista.map(e => {
+        const status = e.devolvido ? 'Devolvido' : 'Ativo';
+
+        return `
+          <tr>
+            <td>${e.usuario}</td>
+            <td>${e.livro}</td>
+            <td>${e.data_atual}</td>
+            <td>${e.data_devolucao}</td>
+            <td>${status}</td>
+          </tr>
+        `;
+      }).join('')}
     </table>
   `;
 }
@@ -97,6 +128,15 @@ inputBusca.addEventListener('keydown', (event) => {
 
 inputBuscaUsuario.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') btnBuscarUsuario.click();
+});
+
+btnEmprestimos.addEventListener('click', async () => {
+  try {
+    const lista = await window.api.listarEmprestimos();
+    renderEmprestimos(lista);
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 carregarInicial();

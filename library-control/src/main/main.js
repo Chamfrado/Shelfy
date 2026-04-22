@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 const { listarAcervo, buscarAcervo } = require('./db/acervo.repo');
 const { buscarUsuarios, listarUsuarios } = require('./db/usuarios.repo');
+const { listarEmprestimos } = require('./db/emprestimos.repo');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -33,6 +34,10 @@ app.whenReady().then(() => {
 
 ipcMain.handle('usuario:buscar', (_, termo) => {
   return buscarUsuarios(termo);
+});
+
+ipcMain.handle('emprestimo:listar', () => {
+  return listarEmprestimos();
 });
 
   createWindow();

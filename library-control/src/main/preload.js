@@ -5,5 +5,7 @@ contextBridge.exposeInMainWorld('api', {
   buscarAcervo: (termo) => ipcRenderer.invoke('acervo:buscar', termo),
 
   listarUsuarios: () => ipcRenderer.invoke('usuario:listar'),
-  buscarUsuarios: (termo) => ipcRenderer.invoke('usuario:buscar', termo)
+  buscarUsuarios: (termo) => ipcRenderer.invoke('usuario:buscar', termo),
+
+  listarEmprestimos: () => ipcRenderer.invoke('emprestimo:listar')
 });
