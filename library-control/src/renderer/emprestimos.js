@@ -193,7 +193,9 @@ function renderLivroSelecionado() {
     return;
   }
 
-  livroSelecionadoCard.className = "selecionado-card";
+  const estoque = getInfoEstoqueLivro(livroSelecionado);
+
+  livroSelecionadoCard.className = `selecionado-card ${estoque.cardClass}`;
   livroSelecionadoCard.innerHTML = `
     <div class="selecionado-card-livro">
       <div>
@@ -204,7 +206,14 @@ function renderLivroSelecionado() {
         }
       </div>
       <div>
-        <div><strong>${livroSelecionado.titulo ?? ""}</strong></div>
+        <div>
+          <strong>${livroSelecionado.titulo ?? ""}</strong>
+          ${
+            estoque.texto
+              ? `<span class="${estoque.badgeClass}">${estoque.texto}</span>`
+              : ""
+          }
+        </div>
         <div>Autor: ${livroSelecionado.autor ?? "-"}</div>
         <div>Disponível: ${livroSelecionado.quantidade ?? 0}</div>
         <div>Total emprestado: ${livroSelecionado.total_emprestimos ?? 0}</div>
@@ -348,39 +357,89 @@ async function selecionarUsuario() {
   usuarioSelecionado = escolhido;
   renderUsuarioSelecionado();
 }
+
+function getInfoEstoqueLivro(livro) {
+  const qtd = Number(livro?.quantidade ?? 0);
+
+  if (qtd <= 0) {
+    return {
+      texto: "Indisponível",
+      badgeClass: "badge-suave",
+      cardClass: "indisponivel",
+    };
+  }
+
+  if (qtd === 1) {
+    return {
+      texto: "Última unidade",
+      badgeClass: "badge-alerta",
+      cardClass: "estoque-baixo",
+    };
+  }
+
+  if (qtd === 2) {
+    return {
+      texto: "Estoque baixo",
+      badgeClass: "badge-aviso",
+      cardClass: "estoque-baixo",
+    };
+  }
+
+  return {
+    texto: null,
+    badgeClass: "",
+    cardClass: "",
+  };
+}
+
 async function selecionarLivro() {
   const livros = await window.api.listarAcervoComResumo();
-
-  const disponiveis = livros.filter(
-    (livro) => Number(livro.quantidade ?? 0) > 0,
-  );
 
   const escolhido = await escolherItemModal({
     title: "Selecionar livro",
     placeholder: "Buscar por título ou autor...",
-    items: disponiveis,
+    items: livros,
     getLabel: (l) => `${l.titulo ?? ""} ${l.autor ?? ""}`,
-    renderItem: (l) => `
-      <div class="modal-item-livro">
-        <div>
-          ${
-            l.capa
-              ? `<img src="./assets/livros/${encodeURIComponent(l.capa)}" alt="Capa" class="modal-item-capa" />`
-              : `<div class="modal-item-capa sem-capa">Sem capa</div>`
-          }
+    renderItem: (l) => {
+      const estoque = getInfoEstoqueLivro(l);
+
+      return `
+        <div class="modal-item-livro">
+          <div>
+            ${
+              l.capa
+                ? `<img src="./assets/livros/${encodeURIComponent(l.capa)}" alt="Capa" class="modal-item-capa" />`
+                : `<div class="modal-item-capa sem-capa">Sem capa</div>`
+            }
+          </div>
+          <div class="modal-item-card ${estoque.cardClass}">
+            <div class="modal-item-title">
+              ${l.titulo ?? ""}
+              ${
+                estoque.texto
+                  ? `<span class="${estoque.badgeClass}">${estoque.texto}</span>`
+                  : ""
+              }
+            </div>
+            <div class="modal-item-sub">Autor: ${l.autor ?? "-"}</div>
+            <div class="modal-item-sub">Disponível: ${l.quantidade ?? 0}</div>
+            <div class="modal-item-sub">Total emprestado: ${l.total_emprestimos ?? 0}</div>
+            <div class="modal-item-sub">Ativos agora: ${l.emprestimos_ativos ?? 0}</div>
+          </div>
         </div>
-        <div class="modal-item-card">
-          <div class="modal-item-title">${l.titulo ?? ""}</div>
-          <div class="modal-item-sub">Autor: ${l.autor ?? "-"}</div>
-          <div class="modal-item-sub">Disponível: ${l.quantidade ?? 0}</div>
-          <div class="modal-item-sub">Total emprestado: ${l.total_emprestimos ?? 0}</div>
-          <div class="modal-item-sub">Ativos agora: ${l.emprestimos_ativos ?? 0}</div>
-        </div>
-      </div>
-    `,
+      `;
+    },
   });
 
   if (!escolhido) return;
+
+  if (Number(escolhido.quantidade ?? 0) <= 0) {
+    await alertModal({
+      title: "Livro indisponível",
+      message: "Este livro não possui unidades disponíveis para empréstimo.",
+    });
+    return;
+  }
 
   livroSelecionado = escolhido;
   renderLivroSelecionado();
@@ -426,6 +485,14 @@ btnCriarEmprestimo.addEventListener("click", async () => {
       await alertModal({
         title: "Validação",
         message: "Selecione um livro.",
+      });
+      return;
+    }
+
+    if (Number(livroSelecionado?.quantidade ?? 0) <= 0) {
+      await alertModal({
+        title: "Empréstimo bloqueado",
+        message: "O livro selecionado não possui unidades disponíveis.",
       });
       return;
     }

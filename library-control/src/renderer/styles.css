@@ -455,3 +455,44 @@ td {
   border: 1px solid #fca5a5;
   background: #fff1f2;
 }
+
+.badge-aviso {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-suave {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.modal-item-card.estoque-baixo {
+  border-left: 4px solid #f59e0b;
+  padding-left: 10px;
+}
+
+.modal-item-card.indisponivel {
+  border-left: 4px solid #6b7280;
+  padding-left: 10px;
+  opacity: 0.8;
+}
+
+.selecionado-card.estoque-baixo {
+  border: 1px solid #fcd34d;
+  background: #fffbeb;
+}
+
+.selecionado-card.indisponivel {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
