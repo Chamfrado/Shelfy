@@ -6,11 +6,25 @@ document.getElementById("app").innerHTML = getLayout(
     <h3>Cadastrar usuário</h3>
 
     <div class="form-box">
+    <label for="usuarioNome">Nome</label>
       <input id="usuarioNome" placeholder="Nome" />
+      <label for="usuarioLogin">Login</label>
       <input id="usuarioLogin" placeholder="Login" />
-      <input id="usuarioNivel" type="number" placeholder="Nível" min="0" />
+      <label for="usuarioNivel">Nível do usuário</label>
+<select id="usuarioNivel">
+  <option value="">Selecione o nível</option>
+  <option value="1">1 - Administrador</option>
+  <option value="2">2 - Aluno</option>
+  <option value="3">3 - Operador</option>
+</select>
+<small class="hint">
+  Se você ainda não souber o significado exato, use o mesmo padrão do sistema antigo.
+</small>
+      <label for="usuarioTurma">Turma</label>
       <input id="usuarioTurma" placeholder="Turma" />
+      <label for="usuarioFone">Telefone</label>
       <input id="usuarioFone" placeholder="Telefone" />
+      <label for="usuarioEmail">E-mail</label>
       <input id="usuarioEmail" placeholder="E-mail" />
       <button id="btnSalvarUsuario">Salvar usuário</button>
     </div>

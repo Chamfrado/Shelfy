@@ -5,22 +5,37 @@ document.getElementById("app").innerHTML = getLayout(
 
     <h3>Cadastrar livro</h3>
 
-    <div class="form-box">
-      <input id="livroTitulo" placeholder="Título" />
-      <input id="livroAutor" placeholder="Autor" />
-      <input id="livroEditora" placeholder="Editora" />
-      <input id="livroIsbn" placeholder="ISBN" />
-      <input id="livroQuantidade" type="number" placeholder="Quantidade" min="0" />
-      <input id="livroCategoria" type="number" placeholder="Categoria (id)" />
+<div class="form-box">
+  <label for="livroTitulo">Título</label>
+  <input id="livroTitulo" placeholder="Título" />
+  <label for="livroAutor">Autor</label>
+  <input id="livroAutor" placeholder="Autor" />
+  <label for="livroEditora">Editora</label>
+  <input id="livroEditora" placeholder="Editora" />
+  <label for="livroIsbn">ISBN</label>
+  <input id="livroIsbn" placeholder="ISBN" />
+  <label for="livroQuantidade">Quantidade</label>
+  <input id="livroQuantidade" type="number" placeholder="Quantidade" min="0" />
 
-      <button id="btnSelecionarImagem" type="button">Selecionar imagem</button>
-      <span id="nomeImagemSelecionada">Nenhuma imagem</span>
+  <label for="livroCategoria">Categoria</label>
+  <select id="livroCategoria">
+    <option value="">Selecione uma categoria</option>
+  </select>
+  <small class="hint">Escolha a categoria do acervo.</small>
 
-      <button id="btnCriarLivro">Salvar livro</button>
-    </div>
+  <label for="livroTipo">Tipo de acervo</label>
+  <select id="livroTipo">
+    <option value="">Selecione um tipo</option>
+  </select>
+  <small class="hint">Ex.: Livro, Apostila, Revista, Jornal, Gibi.</small>
 
-    <div id="statusLivro" class="status-box"></div>
+  <button id="btnSelecionarImagem" type="button">Selecionar imagem</button>
+  <span id="nomeImagemSelecionada">Nenhuma imagem</span>
 
+  <button id="btnCriarLivro">Salvar livro</button>
+</div>
+
+<div id="statusLivro" class="status-box"></div>
     <hr />
 
     <div class="toolbar">
@@ -47,6 +62,8 @@ const nomeImagemSelecionada = document.getElementById("nomeImagemSelecionada");
 const btnCriarLivro = document.getElementById("btnCriarLivro");
 const statusLivro = document.getElementById("statusLivro");
 
+const livroTipo = document.getElementById("livroTipo");
+
 let caminhoImagemSelecionada = null;
 let livroEmEdicaoId = null;
 
@@ -61,6 +78,7 @@ function limparFormulario() {
   nomeImagemSelecionada.textContent = "Nenhuma imagem";
   livroEmEdicaoId = null;
   btnCriarLivro.textContent = "Salvar livro";
+  livroTipo.value = "";
 }
 
 function renderAcervo(lista) {
@@ -118,6 +136,7 @@ function renderAcervo(lista) {
       livroIsbn.value = livro.isbn ?? "";
       livroQuantidade.value = livro.quantidade ?? "";
       livroCategoria.value = livro.categoria ?? "";
+      livroTipo.value = livro.tipo ?? "";
       nomeImagemSelecionada.textContent = livro.capa || "Nenhuma imagem";
       btnCriarLivro.textContent = "Atualizar livro";
       statusLivro.textContent = "Modo edição ativado.";
@@ -162,6 +181,7 @@ btnCriarLivro.addEventListener("click", async () => {
     const editora = livroEditora.value.trim();
     const isbn = livroIsbn.value.trim();
     const quantidade = livroQuantidade.value;
+    const tipo = livroTipo.value;
     const categoria = livroCategoria.value;
 
     if (!titulo) {
@@ -176,6 +196,11 @@ btnCriarLivro.addEventListener("click", async () => {
 
     if (quantidade === "" || Number(quantidade) < 0) {
       statusLivro.textContent = "Quantidade inválida.";
+      return;
+    }
+
+    if (!tipo || Number(tipo) < 1) {
+      statusLivro.textContent = "Informe um tipo válido.";
       return;
     }
 
@@ -195,6 +220,7 @@ btnCriarLivro.addEventListener("click", async () => {
         isbn,
         quantidade,
         categoria,
+        tipo,
         capa: nomeImagem,
       });
       statusLivro.textContent = "Livro atualizado com sucesso.";
@@ -206,6 +232,7 @@ btnCriarLivro.addEventListener("click", async () => {
         isbn,
         quantidade,
         categoria,
+        tipo,
         capa: nomeImagem,
       });
       statusLivro.textContent = "Livro cadastrado com sucesso.";
@@ -235,9 +262,41 @@ inputBusca.addEventListener("keydown", (event) => {
   if (event.key === "Enter") btnBuscar.click();
 });
 
+async function carregarCategoriasETipos() {
+  const categorias = await window.api.listarCategoriasAcervo();
+  const tipos = await window.api.listarTiposAcervo();
+
+  livroCategoria.innerHTML = `
+    <option value="">Selecione uma categoria</option>
+    ${categorias
+      .map(
+        (c) => `
+      <option value="${c.id}">
+        ${c.id} - ${c.titulo}
+      </option>
+    `,
+      )
+      .join("")}
+  `;
+
+  livroTipo.innerHTML = `
+    <option value="">Selecione um tipo</option>
+    ${tipos
+      .map(
+        (t) => `
+      <option value="${t.id}">
+        ${t.id} - ${t.descricao}
+      </option>
+    `,
+      )
+      .join("")}
+  `;
+}
+
 (async function init() {
   try {
     setStatus("Carregando acervo...");
+    await carregarCategoriasETipos();
     await carregarAcervo();
     setStatus("");
   } catch (error) {

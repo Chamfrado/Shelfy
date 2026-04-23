@@ -7,6 +7,8 @@ const {
   criarLivro,
   atualizarLivro,
   excluirLivro,
+  listarCategoriasAcervo,
+  listarTiposAcervo,
 } = require("./db/acervo.repo");
 const {
   listarUsuarios,
@@ -109,6 +111,7 @@ app.whenReady().then(() => {
   ipcMain.handle("acervo:criar", (_, payload) => {
     const quantidade = Number(payload.quantidade);
     const categoria = Number(payload.categoria);
+    const tipo = Number(payload.tipo);
 
     if (!payload.titulo?.trim()) {
       throw new Error("Título obrigatório");
@@ -116,6 +119,10 @@ app.whenReady().then(() => {
 
     if (!Number.isFinite(categoria) || categoria < 1) {
       throw new Error("Categoria inválida");
+    }
+
+    if (!Number.isFinite(tipo) || tipo < 1) {
+      throw new Error("Tipo inválido");
     }
 
     return criarLivro({
@@ -126,7 +133,7 @@ app.whenReady().then(() => {
       quantidade,
       capa: payload.capa || null,
       categoria,
-      tipo: 1, // 🔥 fixo
+      tipo,
     });
   });
 
@@ -179,7 +186,7 @@ app.whenReady().then(() => {
       quantidade: payload.quantidade,
       capa: payload.capa,
       categoria: payload.categoria,
-      tipo: 1,
+      tipo: payload.tipo,
     });
   });
 
@@ -247,6 +254,14 @@ app.whenReady().then(() => {
 
   ipcMain.handle("emprestimo:buscar", (_, payload) => {
     return buscarEmprestimos(payload?.termo || "", payload?.status || "todos");
+  });
+
+  ipcMain.handle("acervo:listar-categorias", () => {
+    return listarCategoriasAcervo();
+  });
+
+  ipcMain.handle("acervo:listar-tipos", () => {
+    return listarTiposAcervo();
   });
 
   createWindow();

@@ -11,7 +11,9 @@ function listarAcervo() {
       editora,
       isbn,
       quantidade,
-      capa
+      capa,
+      categoria,
+      tipo
     FROM cad_acervo
     ORDER BY titulo
   `);
@@ -30,7 +32,9 @@ function buscarAcervo(termo) {
       editora,
       isbn,
       quantidade,
-      capa
+      capa,
+      categoria,
+      tipo
     FROM cad_acervo
     WHERE titulo LIKE ? OR autor LIKE ?
     ORDER BY titulo
@@ -137,6 +141,34 @@ function excluirLivro(id) {
     )
     .run(id);
 }
+
+function listarCategoriasAcervo() {
+  const db = getDatabase();
+
+  return db
+    .prepare(
+      `
+    SELECT id, titulo, cor
+    FROM cad_categoria
+    ORDER BY titulo
+  `,
+    )
+    .all();
+}
+
+function listarTiposAcervo() {
+  const db = getDatabase();
+
+  return db
+    .prepare(
+      `
+    SELECT id, descricao
+    FROM cad_tipo
+    ORDER BY descricao
+  `,
+    )
+    .all();
+}
 module.exports = {
   listarAcervo,
   buscarAcervo,
@@ -144,4 +176,6 @@ module.exports = {
   criarLivro,
   atualizarLivro,
   excluirLivro,
+  listarCategoriasAcervo,
+  listarTiposAcervo,
 };
