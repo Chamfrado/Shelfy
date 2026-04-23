@@ -76,9 +76,19 @@ const btnImportarUsuariosCsv = document.getElementById(
 
 const btnImportarAcervoCsv = document.getElementById("btnImportarAcervoCsv");
 
+window.api.onImportProgress(({ tipo, atual, total }) => {
+  const percentual = total > 0 ? Math.round((atual / total) * 100) : 0;
+
+  const nome = tipo === "acervo" ? "acervo" : "usuários";
+
+  updateLoadingModal(
+    `Importando ${nome}...\n${percentual}% — ${atual} de ${total}`,
+  );
+});
+
 btnImportarAcervoCsv.addEventListener("click", async () => {
   try {
-    showLoadingModal("Analisando arquivo de acervo...");
+    showLoadingModal("Importando acervo...\n0% — 0 de 0");
 
     const preview = await window.api.previewImportarAcervoCsv();
 
@@ -126,7 +136,7 @@ btnImportarAcervoCsv.addEventListener("click", async () => {
 });
 btnImportarUsuariosCsv.addEventListener("click", async () => {
   try {
-    showLoadingModal("Analisando arquivo de usuários...");
+    showLoadingModal("Importando usuários...\n0% — 0 de 0");
 
     const preview = await window.api.previewImportarUsuariosCsv();
 

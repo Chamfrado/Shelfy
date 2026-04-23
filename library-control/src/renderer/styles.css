@@ -547,7 +547,17 @@ td {
   white-space: pre-line;
 }
 
+.loading-text {
+  white-space: pre-line;
+  text-align: center;
+}
+
 .modal-message {
   white-space: pre-line;
   line-height: 1.5;
+}
+
+.loading-text {
+  white-space: pre-line;
+  text-align: center;
 }

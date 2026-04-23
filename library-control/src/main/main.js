@@ -742,7 +742,7 @@ app.whenReady().then(() => {
     };
   });
 
-  ipcMain.handle("importar:usuarios-confirmar", async () => {
+  ipcMain.handle("importar:usuarios-confirmar", async (event) => {
     if (!ultimoArquivoUsuariosImportacao) {
       throw new Error("Nenhum arquivo de usuários selecionado.");
     }
@@ -763,7 +763,7 @@ app.whenReady().then(() => {
     let atualizados = 0;
     let ignorados = 0;
 
-    registros.forEach((r) => {
+    registros.forEach((r, index) => {
       if (!r.nome || !r.login || !r.nivel) {
         ignorados++;
         return;
@@ -784,6 +784,12 @@ app.whenReady().then(() => {
 
       if (existente) atualizados++;
       else criados++;
+
+      event.sender.send("import-progress", {
+        tipo: "usuarios",
+        atual: index + 1,
+        total: registros.length,
+      });
     });
 
     ultimoArquivoUsuariosImportacao = null;
@@ -797,7 +803,7 @@ app.whenReady().then(() => {
     };
   });
 
-  ipcMain.handle("importar:acervo-confirmar", async () => {
+  ipcMain.handle("importar:acervo-confirmar", async (event) => {
     if (!ultimoArquivoAcervoImportacao) {
       throw new Error("Nenhum arquivo de acervo selecionado.");
     }
@@ -819,7 +825,7 @@ app.whenReady().then(() => {
     let atualizados = 0;
     let ignorados = 0;
 
-    registros.forEach((r) => {
+    registros.forEach((r, index) => {
       if (!r.titulo || !r.quantidade || !r.categoria || !r.tipo) {
         ignorados++;
         return;
@@ -840,6 +846,12 @@ app.whenReady().then(() => {
 
       if (existente) atualizados++;
       else criados++;
+
+      event.sender.send("import-progress", {
+        tipo: "acervo",
+        atual: index + 1,
+        total: registros.length,
+      });
     });
 
     ultimoArquivoAcervoImportacao = null;

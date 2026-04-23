@@ -313,6 +313,12 @@ function renderHistoricoTabela(lista, tipo = "usuario") {
     </table>
   `;
 }
+function updateLoadingModal(message = "Processando...") {
+  const el = document.querySelector(".loading-text");
+  if (el) {
+    el.textContent = message;
+  }
+}
 
 function hideLoadingModal() {
   closeModal();

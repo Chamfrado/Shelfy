@@ -1,6 +1,14 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
+  onImportProgress: (callback) => {
+    ipcRenderer.removeAllListeners("import-progress");
+
+    ipcRenderer.on("import-progress", (_, data) => {
+      callback(data);
+    });
+  },
+
   listarAcervo: () => ipcRenderer.invoke("acervo:listar"),
   buscarAcervo: (termo) => ipcRenderer.invoke("acervo:buscar", termo),
   criarLivro: (payload) => ipcRenderer.invoke("acervo:criar", payload),
