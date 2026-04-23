@@ -169,9 +169,14 @@ function renderUsuarioSelecionado() {
     return;
   }
 
-  usuarioSelecionadoCard.className = "selecionado-card";
+  const comAtraso = Number(usuarioSelecionado.emprestimos_atrasados ?? 0) > 0;
+
+  usuarioSelecionadoCard.className = `selecionado-card ${comAtraso ? "atrasado" : ""}`;
   usuarioSelecionadoCard.innerHTML = `
-    <div><strong>${usuarioSelecionado.nome ?? ""}</strong></div>
+    <div>
+      <strong>${usuarioSelecionado.nome ?? ""}</strong>
+      ${comAtraso ? `<span class="badge-alerta">Com atraso</span>` : ""}
+    </div>
     <div>Login: ${usuarioSelecionado.login ?? "-"}</div>
     <div>Nível: ${usuarioSelecionado.nivel ?? "-"}</div>
     <div>Turma: ${usuarioSelecionado.turma ?? "-"}</div>
@@ -319,16 +324,23 @@ async function selecionarUsuario() {
     items: usuarios,
     getLabel: (u) => `${u.nome ?? ""} ${u.login ?? ""}`,
     renderItem: (u) => `
-      <div class="modal-item-card">
-        <div class="modal-item-title">${u.nome ?? ""}</div>
-        <div class="modal-item-sub">Login: ${u.login ?? "-"}</div>
-        <div class="modal-item-sub">Nível: ${u.nivel ?? "-"}</div>
-        <div class="modal-item-sub">Turma: ${u.turma ?? "-"}</div>
-        <div class="modal-item-sub">Histórico: ${u.total_emprestimos ?? 0} empréstimo(s)</div>
-        <div class="modal-item-sub">Ativos: ${u.emprestimos_ativos ?? 0}</div>
-        <div class="modal-item-sub">Atrasados: ${u.emprestimos_atrasados ?? 0}</div>
-      </div>
-    `,
+  <div class="modal-item-card ${Number(u.emprestimos_atrasados ?? 0) > 0 ? "atrasado" : ""}">
+    <div class="modal-item-title">
+      ${u.nome ?? ""}
+      ${
+        Number(u.emprestimos_atrasados ?? 0) > 0
+          ? `<span class="badge-alerta">Com atraso</span>`
+          : ""
+      }
+    </div>
+      <div class="modal-item-sub">Login: ${u.login ?? "-"}</div>
+      <div class="modal-item-sub">Nível: ${u.nivel ?? "-"}</div>
+      <div class="modal-item-sub">Turma: ${u.turma ?? "-"}</div>
+      <div class="modal-item-sub">Histórico: ${u.total_emprestimos ?? 0} empréstimo(s)</div>
+      <div class="modal-item-sub">Ativos: ${u.emprestimos_ativos ?? 0}</div>
+      <div class="modal-item-sub">Atrasados: ${u.emprestimos_atrasados ?? 0}</div>
+    </div>
+`,
   });
 
   if (!escolhido) return;
@@ -426,6 +438,14 @@ btnCriarEmprestimo.addEventListener("click", async () => {
       return;
     }
 
+    if (Number(usuarioSelecionado?.emprestimos_atrasados ?? 0) > 0) {
+      await alertModal({
+        title: "Empréstimo bloqueado",
+        message:
+          "Este usuário possui empréstimo(s) em atraso. Regularize a pendência antes de criar um novo empréstimo.",
+      });
+      return;
+    }
     const confirmado = await confirmModal({
       title: "Criar empréstimo",
       message: `Deseja criar o empréstimo do livro "${livroSelecionado?.titulo ?? ""}" para o usuário "${usuarioSelecionado?.nome ?? ""}" por ${totalDias} dia(s)?`,

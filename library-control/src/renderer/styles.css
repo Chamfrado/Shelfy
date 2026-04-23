@@ -435,3 +435,23 @@ td {
   color: #666;
   background: #f3f4f6;
 }
+
+.badge-alerta {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.modal-item-card.atrasado {
+  border-left: 4px solid #dc2626;
+  padding-left: 10px;
+}
+
+.selecionado-card.atrasado {
+  border: 1px solid #fca5a5;
+  background: #fff1f2;
+}
