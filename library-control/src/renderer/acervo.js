@@ -31,6 +31,10 @@ document.getElementById("app").innerHTML = getLayout(
 
    <button id="btnSelecionarImagem" type="button">Selecionar imagem</button>
   <span id="nomeImagemSelecionada">Nenhuma imagem</span>
+  <div id="previewImagemWrapper" class="hidden">
+  <p><strong>Pré-visualização da capa</strong></p>
+  <img id="previewImagemLivro" class="capa-preview" alt="Pré-visualização da capa" />
+</div>
   <div class="acoes-formulario">
  
     <button id="btnCriarLivro">Salvar livro</button>
@@ -79,6 +83,9 @@ let listaAcervoAtual = [];
 let caminhoImagemSelecionada = null;
 let livroEmEdicaoId = null;
 
+const previewImagemWrapper = document.getElementById("previewImagemWrapper");
+const previewImagemLivro = document.getElementById("previewImagemLivro");
+
 function limparFormulario() {
   livroTitulo.value = "";
   livroAutor.value = "";
@@ -89,8 +96,14 @@ function limparFormulario() {
   livroTipo.value = "";
   caminhoImagemSelecionada = null;
   nomeImagemSelecionada.textContent = "Nenhuma imagem";
+  if (livro.capa) {
+    mostrarPreviewImagem(`./assets/livros/${encodeURIComponent(livro.capa)}`);
+  } else {
+    esconderPreviewImagem();
+  }
   livroEmEdicaoId = null;
   atualizarEstadoEdicaoLivro();
+  esconderPreviewImagem();
 }
 
 function renderAcervo(lista) {
@@ -207,6 +220,8 @@ btnSelecionarImagem.addEventListener("click", async () => {
     caminhoImagemSelecionada = caminho;
     const partes = caminho.split(/[/\\]/);
     nomeImagemSelecionada.textContent = partes[partes.length - 1];
+    const srcPreview = `file://${caminho}`;
+    mostrarPreviewImagem(srcPreview);
   } catch (error) {
     await alertModal({
       title: "Erro",
@@ -382,6 +397,16 @@ btnLimparLivro.addEventListener("click", async () => {
     message: "Formulário limpo.",
   });
 });
+
+function mostrarPreviewImagem(src) {
+  previewImagemLivro.src = src;
+  previewImagemWrapper.classList.remove("hidden");
+}
+
+function esconderPreviewImagem() {
+  previewImagemLivro.src = "";
+  previewImagemWrapper.classList.add("hidden");
+}
 
 (async function init() {
   try {

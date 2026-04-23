@@ -279,3 +279,17 @@ td {
     transform: rotate(360deg);
   }
 }
+
+.capa-preview {
+  width: 120px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  display: block;
+  background: white;
+}
+
+#previewImagemWrapper {
+  margin-top: 8px;
+}
