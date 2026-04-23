@@ -56,4 +56,6 @@ contextBridge.exposeInMainWorld("api", {
   baixarModeloUsuarios: () => ipcRenderer.invoke("modelo:baixar-usuarios"),
 
   importarUsuariosCsv: () => ipcRenderer.invoke("importar:usuarios"),
+
+  importarAcervoCsv: () => ipcRenderer.invoke("importar:acervo"),
 });

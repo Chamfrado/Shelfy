@@ -13,6 +13,8 @@ const {
   listarTiposAcervo,
   buscarLivroPorId,
   listarAcervoComResumo,
+  upsertLivroPorTitulo,
+  buscarLivroPorTitulo,
 } = require("./db/acervo.repo");
 const {
   listarUsuarios,
@@ -706,6 +708,71 @@ app.whenReady().then(() => {
         turma: r.turma || null,
         fone: r.fone || null,
         email: r.email || null,
+      });
+
+      if (existente) {
+        atualizados++;
+      } else {
+        criados++;
+      }
+    });
+
+    return {
+      canceled: false,
+      total: registros.length,
+      criados,
+      atualizados,
+      ignorados,
+    };
+  });
+
+  ipcMain.handle("importar:acervo", async () => {
+    const result = await dialog.showOpenDialog({
+      title: "Selecionar CSV do acervo",
+      properties: ["openFile"],
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePaths.length) {
+      return { canceled: true };
+    }
+
+    const arquivo = result.filePaths[0];
+    const conteudo = fs.readFileSync(arquivo, "utf8");
+
+    const { cabecalho, registros } = parseCsvConteudo(conteudo);
+
+    validarCabecalho(cabecalho, [
+      "titulo",
+      "autor",
+      "editora",
+      "isbn",
+      "quantidade",
+      "categoria",
+      "tipo",
+    ]);
+
+    let criados = 0;
+    let atualizados = 0;
+    let ignorados = 0;
+
+    registros.forEach((r) => {
+      if (!r.titulo || !r.quantidade || !r.categoria || !r.tipo) {
+        ignorados++;
+        return;
+      }
+
+      const existente = buscarLivroPorTitulo(r.titulo);
+
+      upsertLivroPorTitulo({
+        titulo: r.titulo,
+        autor: r.autor || null,
+        editora: r.editora || null,
+        isbn: r.isbn || null,
+        quantidade: Number(r.quantidade),
+        categoria: Number(r.categoria),
+        tipo: Number(r.tipo),
+        capa: null,
       });
 
       if (existente) {

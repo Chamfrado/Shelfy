@@ -215,6 +215,31 @@ function listarAcervoComResumo() {
   return stmt.all();
 }
 
+function buscarLivroPorTitulo(titulo) {
+  const db = getDatabase();
+
+  return db
+    .prepare(
+      `
+    SELECT id
+    FROM cad_acervo
+    WHERE lower(titulo) = lower(?)
+    LIMIT 1
+  `,
+    )
+    .get(titulo);
+}
+
+function upsertLivroPorTitulo(dados) {
+  const existente = buscarLivroPorTitulo(dados.titulo);
+
+  if (existente) {
+    return atualizarLivro(existente.id, dados);
+  }
+
+  return criarLivro(dados);
+}
+
 module.exports = {
   listarAcervo,
   buscarAcervo,
@@ -226,4 +251,6 @@ module.exports = {
   listarTiposAcervo,
   buscarLivroPorId,
   listarAcervoComResumo,
+  buscarLivroPorTitulo,
+  upsertLivroPorTitulo,
 };

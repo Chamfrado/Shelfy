@@ -17,6 +17,7 @@ document.getElementById("app").innerHTML = getLayout(
 <h4>Importar usuários</h4>
 <div class="form-box">
   <button id="btnImportarUsuariosCsv">Importar Usuários (CSV)</button>
+  <button id="btnImportarAcervoCsv">Importar Acervo (CSV)</button>
 </div>
 
 
@@ -72,6 +73,44 @@ const btnBaixarModeloUsuarios = document.getElementById(
 const btnImportarUsuariosCsv = document.getElementById(
   "btnImportarUsuariosCsv",
 );
+
+const btnImportarAcervoCsv = document.getElementById("btnImportarAcervoCsv");
+
+btnImportarAcervoCsv.addEventListener("click", async () => {
+  try {
+    const confirmado = await confirmModal({
+      title: "Importar acervo",
+      message:
+        "Selecione um arquivo CSV no modelo correto. Itens com o mesmo título serão atualizados. Deseja continuar?",
+    });
+
+    if (!confirmado) return;
+
+    showLoadingModal("Importando acervo...");
+
+    const resultado = await window.api.importarAcervoCsv();
+
+    hideLoadingModal();
+
+    if (resultado?.canceled) return;
+
+    await alertModal({
+      title: "Importação concluída",
+      message:
+        `Registros identificados: ${resultado.total}\n\n` +
+        `Criados: ${resultado.criados}\n` +
+        `Atualizados: ${resultado.atualizados}\n` +
+        `Ignorados: ${resultado.ignorados}`,
+    });
+  } catch (error) {
+    hideLoadingModal();
+
+    await alertModal({
+      title: "Erro na importação",
+      message: error.message,
+    });
+  }
+});
 
 btnImportarUsuariosCsv.addEventListener("click", async () => {
   try {
