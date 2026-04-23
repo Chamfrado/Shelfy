@@ -37,6 +37,53 @@
           </div>
         </section>
 
+        <section id="page-acervo" class="page">
+          <h2>Acervo</h2>
+
+          <h3>Cadastrar livro</h3>
+
+          <div class="form-emprestimo">
+            <input id="livroTitulo" placeholder="Título" />
+            <input id="livroAutor" placeholder="Autor" />
+            <input id="livroEditora" placeholder="Editora" />
+            <input id="livroIsbn" placeholder="ISBN" />
+            <input
+              id="livroQuantidade"
+              type="number"
+              placeholder="Quantidade"
+              min="0"
+            />
+
+            <!-- Categoria -->
+            <input
+              id="livroCategoria"
+              type="number"
+              placeholder="Categoria (id)"
+            />
+
+            <!-- Upload -->
+            <button id="btnSelecionarImagem" type="button">
+              Selecionar imagem
+            </button>
+            <span id="nomeImagemSelecionada">Nenhuma imagem</span>
+
+            <button id="btnCriarLivro">Salvar livro</button>
+          </div>
+
+          <div id="statusLivro"></div>
+
+          <hr />
+
+          <input
+            type="text"
+            id="busca"
+            placeholder="Buscar por título ou autor..."
+          />
+          <button id="btnBuscar">Buscar</button>
+
+          <div id="resultado"></div>
+        </section>
+
         <h3>Empréstimos atrasados</h3>
         <button id="btnCarregarAtrasados">Carregar atrasados</button>
         <div id="resultadoAtrasados"></div>

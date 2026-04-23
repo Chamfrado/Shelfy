@@ -149,3 +149,8 @@ button {
   border: 1px solid #ccc;
   display: block;
 }
+
+#statusLivro {
+  margin: 12px 0;
+  font-weight: bold;
+}

@@ -3,6 +3,11 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("api", {
   listarAcervo: () => ipcRenderer.invoke("acervo:listar"),
   buscarAcervo: (termo) => ipcRenderer.invoke("acervo:buscar", termo),
+  criarLivro: (payload) => ipcRenderer.invoke("acervo:criar", payload),
+  selecionarImagemLivro: () => ipcRenderer.invoke("imagem:selecionar"),
+  uploadImagemLivro: (filePath) =>
+    ipcRenderer.invoke("imagem:upload", filePath),
+  atualizarLivro: (payload) => ipcRenderer.invoke("acervo:atualizar", payload),
 
   listarUsuarios: () => ipcRenderer.invoke("usuario:listar"),
   buscarUsuarios: (termo) => ipcRenderer.invoke("usuario:buscar", termo),

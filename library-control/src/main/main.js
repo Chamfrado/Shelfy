@@ -1,9 +1,11 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("node:path");
 const {
   listarAcervo,
   buscarAcervo,
   contarAcervo,
+  criarLivro,
+  atualizarLivro,
 } = require("./db/acervo.repo");
 const {
   listarUsuarios,
@@ -18,6 +20,8 @@ const {
   criarEmprestimo,
   registrarDevolucao,
 } = require("./db/emprestimos.repo");
+
+const fs = require("fs");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -95,6 +99,83 @@ app.whenReady().then(() => {
 
   ipcMain.handle("dashboard:contar-emprestimos-atrasados", () => {
     return contarEmprestimosAtrasados();
+  });
+
+  ipcMain.handle("acervo:criar", (_, payload) => {
+    const quantidade = Number(payload.quantidade);
+    const categoria = Number(payload.categoria);
+
+    if (!payload.titulo?.trim()) {
+      throw new Error("Título obrigatório");
+    }
+
+    if (!Number.isFinite(categoria) || categoria < 1) {
+      throw new Error("Categoria inválida");
+    }
+
+    return criarLivro({
+      titulo: payload.titulo.trim(),
+      autor: payload.autor?.trim() || null,
+      editora: payload.editora?.trim() || null,
+      isbn: payload.isbn?.trim() || null,
+      quantidade,
+      capa: payload.capa || null,
+      categoria,
+      tipo: 1, // 🔥 fixo
+    });
+  });
+
+  ipcMain.handle("imagem:selecionar", async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ["openFile"],
+      filters: [{ name: "Imagens", extensions: ["jpg", "jpeg", "png"] }],
+    });
+
+    if (result.canceled || !result.filePaths.length) {
+      return null;
+    }
+
+    return result.filePaths[0];
+  });
+
+  ipcMain.handle("imagem:upload", async (_, filePath) => {
+    if (!filePath) {
+      throw new Error("Arquivo não informado.");
+    }
+
+    const ext = path.extname(filePath).toLowerCase();
+
+    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+      throw new Error("Formato inválido. Use JPG, JPEG ou PNG.");
+    }
+
+    const prefixo = Date.now().toString(16);
+    const nomeOriginal = path.basename(filePath, ext);
+    const nomeSeguro = nomeOriginal.replace(/[^\w\s()-]/g, "").trim();
+    const nomeFinal = `${prefixo}_${nomeSeguro}${ext}`;
+
+    const destino = path.join(
+      __dirname,
+      "../renderer/assets/livros",
+      nomeFinal,
+    );
+
+    fs.copyFileSync(filePath, destino);
+
+    return nomeFinal;
+  });
+
+  ipcMain.handle("acervo:atualizar", (_, payload) => {
+    return atualizarLivro(payload.id, {
+      titulo: payload.titulo,
+      autor: payload.autor,
+      editora: payload.editora,
+      isbn: payload.isbn,
+      quantidade: payload.quantidade,
+      capa: payload.capa,
+      categoria: payload.categoria,
+      tipo: 1,
+    });
   });
 
   createWindow();

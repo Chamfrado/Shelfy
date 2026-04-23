@@ -26,8 +26,26 @@ const cardEmprestimosAtrasados = document.getElementById(
   "cardEmprestimosAtrasados",
 );
 
+const livroTitulo = document.getElementById("livroTitulo");
+const livroAutor = document.getElementById("livroAutor");
+const livroEditora = document.getElementById("livroEditora");
+const livroIsbn = document.getElementById("livroIsbn");
+const livroQuantidade = document.getElementById("livroQuantidade");
+const livroCapa = document.getElementById("livroCapa");
+const btnCriarLivro = document.getElementById("btnCriarLivro");
+const statusLivro = document.getElementById("statusLivro");
+const livroCategoria = document.getElementById("livroCategoria");
+const livroTipo = document.getElementById("livroTipo");
+
 const navButtons = document.querySelectorAll(".nav-btn");
 const pages = document.querySelectorAll(".page");
+
+const btnSelecionarImagem = document.getElementById("btnSelecionarImagem");
+const nomeImagemSelecionada = document.getElementById("nomeImagemSelecionada");
+
+let caminhoImagemSelecionada = null;
+
+let livroEmEdicaoId = null;
 
 function setStatus(message) {
   if (statusEl) {
@@ -46,6 +64,7 @@ function renderAcervo(lista) {
         <th>Editora</th>
         <th>Qtd</th>
         <th>Status</th>
+        <th>Ações</th>
       </tr>
       ${lista
         .map((l) => {
@@ -66,12 +85,37 @@ function renderAcervo(lista) {
             <td>${l.editora ?? ""}</td>
             <td>${qtd}</td>
             <td>${status}</td>
+            <td>
+                <button class="btn-editar" data-id="${l.id}">Editar</button>
+            </td>
           </tr>
         `;
         })
         .join("")}
     </table>
   `;
+  document.querySelectorAll(".btn-editar").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const livro = lista.find((l) => String(l.id) === String(id));
+
+      if (!livro) return;
+
+      livroEmEdicaoId = livro.id;
+
+      livroTitulo.value = livro.titulo ?? "";
+      livroAutor.value = livro.autor ?? "";
+      livroEditora.value = livro.editora ?? "";
+      livroIsbn.value = livro.isbn ?? "";
+      livroQuantidade.value = livro.quantidade ?? "";
+      livroCategoria.value = livro.categoria ?? "";
+
+      nomeImagemSelecionada.textContent = livro.capa || "Nenhuma imagem";
+
+      btnCriarLivro.textContent = "Atualizar livro";
+      statusLivro.textContent = "Modo edição ativado";
+    });
+  });
 }
 
 function renderUsuarios(lista) {
@@ -411,6 +455,104 @@ function bindNavegacao() {
     });
   });
 }
+
+btnCriarLivro.addEventListener("click", async () => {
+  try {
+    const titulo = livroTitulo.value.trim();
+    const autor = livroAutor.value.trim();
+    const editora = livroEditora.value.trim();
+    const isbn = livroIsbn.value.trim();
+    const quantidade = livroQuantidade.value;
+    const categoria = livroCategoria.value;
+
+    if (!titulo) {
+      statusLivro.textContent = "Informe o título.";
+      return;
+    }
+
+    if (!categoria || Number(categoria) < 1) {
+      statusLivro.textContent = "Informe uma categoria válida.";
+      return;
+    }
+
+    if (quantidade === "" || Number(quantidade) < 0) {
+      statusLivro.textContent = "Quantidade inválida.";
+      return;
+    }
+
+    statusLivro.textContent = "Processando...";
+
+    let nomeImagem = null;
+
+    // upload
+    if (caminhoImagemSelecionada) {
+      nomeImagem = await window.api.uploadImagemLivro(caminhoImagemSelecionada);
+    }
+
+    if (livroEmEdicaoId) {
+      await window.api.atualizarLivro({
+        id: livroEmEdicaoId,
+        titulo,
+        autor,
+        editora,
+        isbn,
+        quantidade,
+        capa: nomeImagem,
+        categoria,
+      });
+
+      statusLivro.textContent = "Livro atualizado com sucesso.";
+    } else {
+      await window.api.criarLivro({
+        titulo,
+        autor,
+        editora,
+        isbn,
+        quantidade,
+        capa: nomeImagem,
+        categoria,
+      });
+
+      statusLivro.textContent = "Livro cadastrado com sucesso.";
+    }
+
+    statusLivro.textContent = "Livro cadastrado com sucesso.";
+
+    // limpar
+    livroTitulo.value = "";
+    livroAutor.value = "";
+    livroEditora.value = "";
+    livroIsbn.value = "";
+    livroQuantidade.value = "";
+    livroCategoria.value = "";
+    caminhoImagemSelecionada = null;
+    nomeImagemSelecionada.textContent = "Nenhuma imagem";
+    livroEmEdicaoId = null;
+    btnCriarLivro.textContent = "Salvar livro";
+
+    await carregarAcervo();
+    await carregarDashboard();
+  } catch (error) {
+    console.error(error);
+    statusLivro.textContent = `Erro: ${error.message}`;
+  }
+});
+
+btnSelecionarImagem.addEventListener("click", async () => {
+  try {
+    const caminho = await window.api.selecionarImagemLivro();
+
+    if (!caminho) return;
+
+    caminhoImagemSelecionada = caminho;
+
+    const partes = caminho.split(/[/\\]/);
+    nomeImagemSelecionada.textContent = partes[partes.length - 1];
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message);
+  }
+});
 
 bindNavegacao();
 carregarInicial();
