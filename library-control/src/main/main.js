@@ -11,6 +11,8 @@ const {
   listarUsuarios,
   buscarUsuarios,
   contarUsuarios,
+  criarUsuario,
+  atualizarUsuario,
 } = require("./db/usuarios.repo");
 const {
   listarEmprestimos,
@@ -175,6 +177,60 @@ app.whenReady().then(() => {
       capa: payload.capa,
       categoria: payload.categoria,
       tipo: 1,
+    });
+  });
+
+  ipcMain.handle("usuario:criar", (_, payload) => {
+    if (!payload?.nome?.trim()) {
+      throw new Error("Nome é obrigatório.");
+    }
+
+    if (!payload?.login?.trim()) {
+      throw new Error("Login é obrigatório.");
+    }
+
+    const nivel = Number(payload.nivel);
+    if (!Number.isFinite(nivel)) {
+      throw new Error("Nível inválido.");
+    }
+
+    return criarUsuario({
+      nome: payload.nome.trim(),
+      login: payload.login.trim(),
+      nivel,
+      turma: payload.turma?.trim() || null,
+      fone: payload.fone?.trim() || null,
+      email: payload.email?.trim() || null,
+    });
+  });
+
+  ipcMain.handle("usuario:atualizar", (_, payload) => {
+    const id = Number(payload.id);
+
+    if (!id) {
+      throw new Error("ID do usuário inválido.");
+    }
+
+    if (!payload?.nome?.trim()) {
+      throw new Error("Nome é obrigatório.");
+    }
+
+    if (!payload?.login?.trim()) {
+      throw new Error("Login é obrigatório.");
+    }
+
+    const nivel = Number(payload.nivel);
+    if (!Number.isFinite(nivel)) {
+      throw new Error("Nível inválido.");
+    }
+
+    return atualizarUsuario(id, {
+      nome: payload.nome.trim(),
+      login: payload.login.trim(),
+      nivel,
+      turma: payload.turma?.trim() || null,
+      fone: payload.fone?.trim() || null,
+      email: payload.email?.trim() || null,
     });
   });
 

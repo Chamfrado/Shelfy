@@ -24,4 +24,8 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("dashboard:contar-emprestimos-ativos"),
   contarEmprestimosAtrasados: () =>
     ipcRenderer.invoke("dashboard:contar-emprestimos-atrasados"),
+
+  criarUsuario: (payload) => ipcRenderer.invoke("usuario:criar", payload),
+  atualizarUsuario: (payload) =>
+    ipcRenderer.invoke("usuario:atualizar", payload),
 });

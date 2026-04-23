@@ -43,6 +43,17 @@ const pages = document.querySelectorAll(".page");
 const btnSelecionarImagem = document.getElementById("btnSelecionarImagem");
 const nomeImagemSelecionada = document.getElementById("nomeImagemSelecionada");
 
+const usuarioNome = document.getElementById("usuarioNome");
+const usuarioLogin = document.getElementById("usuarioLogin");
+const usuarioNivel = document.getElementById("usuarioNivel");
+const usuarioTurma = document.getElementById("usuarioTurma");
+const usuarioFone = document.getElementById("usuarioFone");
+const usuarioEmail = document.getElementById("usuarioEmail");
+const btnSalvarUsuario = document.getElementById("btnSalvarUsuario");
+const statusUsuario = document.getElementById("statusUsuario");
+
+let usuarioEmEdicaoId = null;
+
 let caminhoImagemSelecionada = null;
 
 let livroEmEdicaoId = null;
@@ -123,27 +134,54 @@ function renderUsuarios(lista) {
     <h2>Usuários - Total: ${lista.length}</h2>
     <table>
       <tr>
-        ${
-          lista.length > 0
-            ? Object.keys(lista[0])
-                .map((col) => `<th>${col}</th>`)
-                .join("")
-            : "<th>Sem dados</th>"
-        }
+        <th>Nome</th>
+        <th>Login</th>
+        <th>Nível</th>
+        <th>Turma</th>
+        <th>Telefone</th>
+        <th>E-mail</th>
+        <th>Ações</th>
       </tr>
       ${lista
         .map(
           (usuario) => `
         <tr>
-          ${Object.values(usuario)
-            .map((valor) => `<td>${valor ?? ""}</td>`)
-            .join("")}
+          <td>${usuario.nome ?? ""}</td>
+          <td>${usuario.login ?? ""}</td>
+          <td>${usuario.nivel ?? ""}</td>
+          <td>${usuario.turma ?? ""}</td>
+          <td>${usuario.fone ?? ""}</td>
+          <td>${usuario.email ?? ""}</td>
+          <td>
+            <button class="btn-editar-usuario" data-id="${usuario.id}">Editar</button>
+          </td>
         </tr>
       `,
         )
         .join("")}
     </table>
   `;
+
+  document.querySelectorAll(".btn-editar-usuario").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const usuario = lista.find((u) => String(u.id) === String(id));
+
+      if (!usuario) return;
+
+      usuarioEmEdicaoId = usuario.id;
+
+      usuarioNome.value = usuario.nome ?? "";
+      usuarioLogin.value = usuario.login ?? "";
+      usuarioNivel.value = usuario.nivel ?? "";
+      usuarioTurma.value = usuario.turma ?? "";
+      usuarioFone.value = usuario.fone ?? "";
+      usuarioEmail.value = usuario.email ?? "";
+
+      btnSalvarUsuario.textContent = "Atualizar usuário";
+      statusUsuario.textContent = "Modo edição ativado.";
+    });
+  });
 }
 
 function renderEmprestimos(lista) {
@@ -553,6 +591,71 @@ btnSelecionarImagem.addEventListener("click", async () => {
     setStatus(error.message);
   }
 });
+btnSalvarUsuario.addEventListener("click", async () => {
+  try {
+    const nome = usuarioNome.value.trim();
+    const login = usuarioLogin.value.trim();
+    const nivel = usuarioNivel.value;
+    const turma = usuarioTurma.value.trim();
+    const fone = usuarioFone.value.trim();
+    const email = usuarioEmail.value.trim();
 
+    if (!nome) {
+      statusUsuario.textContent = "Informe o nome.";
+      return;
+    }
+
+    if (!login) {
+      statusUsuario.textContent = "Informe o login.";
+      return;
+    }
+
+    if (nivel === "") {
+      statusUsuario.textContent = "Informe o nível.";
+      return;
+    }
+
+    if (usuarioEmEdicaoId) {
+      await window.api.atualizarUsuario({
+        id: usuarioEmEdicaoId,
+        nome,
+        login,
+        nivel,
+        turma,
+        fone,
+        email,
+      });
+
+      statusUsuario.textContent = "Usuário atualizado com sucesso.";
+    } else {
+      await window.api.criarUsuario({
+        nome,
+        login,
+        nivel,
+        turma,
+        fone,
+        email,
+      });
+
+      statusUsuario.textContent = "Usuário cadastrado com sucesso.";
+    }
+
+    usuarioNome.value = "";
+    usuarioLogin.value = "";
+    usuarioNivel.value = "";
+    usuarioTurma.value = "";
+    usuarioFone.value = "";
+    usuarioEmail.value = "";
+
+    usuarioEmEdicaoId = null;
+    btnSalvarUsuario.textContent = "Salvar usuário";
+
+    await carregarUsuarios();
+    await carregarDashboard();
+  } catch (error) {
+    console.error(error);
+    statusUsuario.textContent = `Erro ao salvar usuário: ${error.message}`;
+  }
+});
 bindNavegacao();
 carregarInicial();
