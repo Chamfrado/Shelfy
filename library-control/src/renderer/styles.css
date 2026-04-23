@@ -144,3 +144,15 @@ td {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+.status-ativo {
+  background: #eef7ff;
+}
+
+.status-devolvido {
+  background: #e8f5e9;
+}
+
+.status-atrasado {
+  background: #ffe5e5;
+}

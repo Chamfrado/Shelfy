@@ -22,15 +22,26 @@ document.getElementById("app").innerHTML = getLayout(
 
     <div id="statusEmprestimo" class="status-box"></div>
 
-    <hr />
-
-    <h3>Empréstimos atrasados</h3>
-    <button id="btnCarregarAtrasados">Carregar atrasados</button>
-    <div id="resultadoAtrasados"></div>
+    
 
     <hr />
 
     <h2>Empréstimos</h2>
+    <div class="toolbar">
+      <input
+        id="buscaEmprestimo"
+        placeholder="Buscar por usuário ou livro..."
+      />
+
+      <select id="filtroStatusEmprestimo">
+        <option value="todos">Todos</option>
+        <option value="ativos">Ativos</option>
+        <option value="devolvidos">Devolvidos</option>
+        <option value="atrasados">Atrasados</option>
+      </select>
+
+      <button id="btnBuscarEmprestimos">Buscar</button>
+    </div>
     <button id="btnCarregarEmprestimos">Carregar empréstimos</button>
     <div id="resultadoEmprestimos"></div>
   `,
@@ -45,6 +56,11 @@ const btnCarregarAtrasados = document.getElementById("btnCarregarAtrasados");
 const resultadoAtrasadosEl = document.getElementById("resultadoAtrasados");
 const btnEmprestimos = document.getElementById("btnCarregarEmprestimos");
 const resultadoEmprestimosEl = document.getElementById("resultadoEmprestimos");
+const inputBuscaEmprestimo = document.getElementById("buscaEmprestimo");
+const filtroStatusEmprestimo = document.getElementById(
+  "filtroStatusEmprestimo",
+);
+const btnBuscarEmprestimos = document.getElementById("btnBuscarEmprestimos");
 
 function preencherSelectUsuarios(lista) {
   selectUsuario.innerHTML = `
@@ -92,11 +108,19 @@ function renderEmprestimos(lista) {
       </tr>
       ${lista
         .map((e) => {
-          const jaDevolvido = normalizarTexto(e.devolvido).includes("sim");
-          const status = jaDevolvido ? "Devolvido" : "Ativo";
+          const status = getStatusEmprestimo(e);
+
+          const classeLinha =
+            status === "Atrasado"
+              ? "status-atrasado"
+              : status === "Devolvido"
+                ? "status-devolvido"
+                : "status-ativo";
+
+          const jaDevolvido = status === "Devolvido";
 
           return `
-          <tr>
+          <tr class="${classeLinha}">
             <td>${e.usuario ?? ""}</td>
             <td>${e.livro ?? ""}</td>
             <td>${e.data_atual ?? ""}</td>
@@ -155,6 +179,18 @@ async function carregarEmprestimos() {
   renderEmprestimos(lista);
 }
 
+async function buscarEmprestimosTela() {
+  const termo = inputBuscaEmprestimo.value.trim();
+  const status = filtroStatusEmprestimo.value;
+
+  const lista = await window.api.buscarEmprestimos({
+    termo,
+    status,
+  });
+
+  renderEmprestimos(lista);
+}
+
 async function carregarAtrasados() {
   const lista = await window.api.listarEmprestimosAtrasados();
   renderAtrasados(lista);
@@ -168,6 +204,28 @@ async function carregarTudo() {
   await carregarEmprestimos();
   await carregarAtrasados();
 }
+
+btnBuscarEmprestimos.addEventListener("click", async () => {
+  try {
+    await buscarEmprestimosTela();
+  } catch (error) {
+    setStatus(`Erro ao buscar empréstimos: ${error.message}`);
+  }
+});
+
+inputBuscaEmprestimo.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    btnBuscarEmprestimos.click();
+  }
+});
+
+filtroStatusEmprestimo.addEventListener("change", async () => {
+  try {
+    await buscarEmprestimosTela();
+  } catch (error) {
+    setStatus(`Erro ao filtrar empréstimos: ${error.message}`);
+  }
+});
 
 btnCriarEmprestimo.addEventListener("click", async () => {
   try {
@@ -228,3 +286,16 @@ btnEmprestimos.addEventListener("click", async () => {
     setStatus(`Erro ao carregar empréstimos: ${error.message}`);
   }
 })();
+
+function getStatusEmprestimo(e) {
+  const jaDevolvido = normalizarTexto(e.devolvido).includes("sim");
+  const atrasado =
+    !jaDevolvido &&
+    e.data_devolucao &&
+    new Date(e.data_devolucao) <
+      new Date(new Date().toISOString().slice(0, 10));
+
+  if (jaDevolvido) return "Devolvido";
+  if (atrasado) return "Atrasado";
+  return "Ativo";
+}

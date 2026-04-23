@@ -23,6 +23,7 @@ const {
   contarEmprestimosAtrasados,
   criarEmprestimo,
   registrarDevolucao,
+  buscarEmprestimos,
 } = require("./db/emprestimos.repo");
 
 const fs = require("fs");
@@ -242,6 +243,10 @@ app.whenReady().then(() => {
 
   ipcMain.handle("usuario:excluir", (_, id) => {
     return excluirUsuario(Number(id));
+  });
+
+  ipcMain.handle("emprestimo:buscar", (_, payload) => {
+    return buscarEmprestimos(payload?.termo || "", payload?.status || "todos");
   });
 
   createWindow();

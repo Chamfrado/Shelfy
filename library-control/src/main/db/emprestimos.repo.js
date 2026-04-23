@@ -200,6 +200,49 @@ function contarEmprestimosAtrasados() {
   return stmt.get();
 }
 
+function buscarEmprestimos(termo, status) {
+  const db = getDatabase();
+
+  let sql = `
+    SELECT
+      e.id,
+      e.user_id,
+      e.acervo_id,
+      u.nome AS usuario,
+      a.titulo AS livro,
+      e.total_dias,
+      e.data_atual,
+      e.data_devolucao,
+      e.dia_semana,
+      e.devolvido,
+      e.data_entregue
+    FROM emprestimos e
+    JOIN cad_usuario u ON u.id = e.user_id
+    JOIN cad_acervo a ON a.id = e.acervo_id
+    WHERE 1=1
+  `;
+
+  const params = [];
+
+  if (termo) {
+    sql += ` AND (u.nome LIKE ? OR a.titulo LIKE ?)`;
+    params.push(`%${termo}%`, `%${termo}%`);
+  }
+
+  if (status === "ativos") {
+    sql += ` AND lower(e.devolvido) NOT LIKE '%sim%'`;
+  } else if (status === "devolvidos") {
+    sql += ` AND lower(e.devolvido) LIKE '%sim%'`;
+  } else if (status === "atrasados") {
+    sql += ` AND lower(e.devolvido) NOT LIKE '%sim%'
+             AND date(e.data_devolucao) < date('now', 'localtime')`;
+  }
+
+  sql += ` ORDER BY e.id DESC`;
+
+  return db.prepare(sql).all(...params);
+}
+
 module.exports = {
   listarEmprestimos,
   criarEmprestimo,
@@ -207,4 +250,5 @@ module.exports = {
   listarEmprestimosAtrasados,
   contarEmprestimosAtivos,
   contarEmprestimosAtrasados,
+  buscarEmprestimos,
 };
