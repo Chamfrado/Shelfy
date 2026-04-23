@@ -417,9 +417,20 @@ btnCriarEmprestimo.addEventListener("click", async () => {
       return;
     }
 
+    const confirmado = await confirmModal({
+      title: "Criar empréstimo",
+      message: `Deseja criar o empréstimo do livro "${livroSelecionado?.titulo ?? ""}" para o usuário "${usuarioSelecionado?.nome ?? ""}" por ${totalDias} dia(s)?`,
+    });
+
+    if (!confirmado) return;
+
     showLoadingModal("Criando empréstimo...");
 
-    await window.api.criarEmprestimo({ userId, acervoId, totalDias });
+    await window.api.criarEmprestimo({
+      userId,
+      acervoId,
+      totalDias,
+    });
 
     hideLoadingModal();
 
@@ -429,7 +440,7 @@ btnCriarEmprestimo.addEventListener("click", async () => {
     renderLivroSelecionado();
     inputDias.value = 7;
 
-    await carregarEmprestimos();
+    await buscarEmprestimosTela();
 
     await alertModal({
       title: "Sucesso",
@@ -437,6 +448,7 @@ btnCriarEmprestimo.addEventListener("click", async () => {
     });
   } catch (error) {
     hideLoadingModal();
+
     await alertModal({
       title: "Erro",
       message: error.message,
@@ -475,7 +487,7 @@ filtroStatusEmprestimo.addEventListener("change", async () => {
 (async function init() {
   try {
     setStatus("Carregando empréstimos...");
-    await carregarEmprestimos();
+    await buscarEmprestimosTela();
     renderUsuarioSelecionado();
     renderLivroSelecionado();
     setStatus("");
