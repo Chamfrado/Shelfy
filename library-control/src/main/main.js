@@ -343,5 +343,105 @@ app.whenReady().then(() => {
     };
   });
 
+  function escapeCsv(value) {
+    if (value === null || value === undefined) return "";
+    const str = String(value).replace(/"/g, '""');
+    return /[",\n;]/.test(str) ? `"${str}"` : str;
+  }
+
+  function toCsv(rows) {
+    if (!rows || !rows.length) {
+      return "";
+    }
+
+    const headers = Object.keys(rows[0]);
+    const lines = [
+      headers.join(";"),
+      ...rows.map((row) =>
+        headers.map((header) => escapeCsv(row[header])).join(";"),
+      ),
+    ];
+
+    return lines.join("\n");
+  }
+
+  ipcMain.handle("relatorio:exportar-acervo", async () => {
+    const dados = listarAcervo();
+
+    const agora = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const nomeArquivo = `acervo-${agora.getFullYear()}-${pad(agora.getMonth() + 1)}-${pad(agora.getDate())}_${pad(agora.getHours())}-${pad(agora.getMinutes())}-${pad(agora.getSeconds())}.csv`;
+
+    const result = await dialog.showSaveDialog({
+      title: "Salvar relatório de acervo",
+      defaultPath: nomeArquivo,
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+
+    const csv = toCsv(dados);
+    fs.writeFileSync(result.filePath, csv, "utf8");
+
+    return {
+      canceled: false,
+      path: result.filePath,
+    };
+  });
+
+  ipcMain.handle("relatorio:exportar-usuarios", async () => {
+    const dados = listarUsuarios();
+
+    const agora = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const nomeArquivo = `usuarios-${agora.getFullYear()}-${pad(agora.getMonth() + 1)}-${pad(agora.getDate())}_${pad(agora.getHours())}-${pad(agora.getMinutes())}-${pad(agora.getSeconds())}.csv`;
+
+    const result = await dialog.showSaveDialog({
+      title: "Salvar relatório de usuários",
+      defaultPath: nomeArquivo,
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+
+    const csv = toCsv(dados);
+    fs.writeFileSync(result.filePath, csv, "utf8");
+
+    return {
+      canceled: false,
+      path: result.filePath,
+    };
+  });
+
+  ipcMain.handle("relatorio:exportar-emprestimos", async () => {
+    const dados = listarEmprestimos();
+
+    const agora = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const nomeArquivo = `emprestimos-${agora.getFullYear()}-${pad(agora.getMonth() + 1)}-${pad(agora.getDate())}_${pad(agora.getHours())}-${pad(agora.getMinutes())}-${pad(agora.getSeconds())}.csv`;
+
+    const result = await dialog.showSaveDialog({
+      title: "Salvar relatório de empréstimos",
+      defaultPath: nomeArquivo,
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+
+    const csv = toCsv(dados);
+    fs.writeFileSync(result.filePath, csv, "utf8");
+
+    return {
+      canceled: false,
+      path: result.filePath,
+    };
+  });
+
   createWindow();
 });

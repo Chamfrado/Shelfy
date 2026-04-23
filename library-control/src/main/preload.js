@@ -36,4 +36,8 @@ contextBridge.exposeInMainWorld("api", {
   listarTiposAcervo: () => ipcRenderer.invoke("acervo:listar-tipos"),
   fazerBackup: () => ipcRenderer.invoke("sistema:fazer-backup"),
   restaurarBackup: () => ipcRenderer.invoke("sistema:restaurar-backup"),
+  exportarAcervoCsv: () => ipcRenderer.invoke("relatorio:exportar-acervo"),
+  exportarUsuariosCsv: () => ipcRenderer.invoke("relatorio:exportar-usuarios"),
+  exportarEmprestimosCsv: () =>
+    ipcRenderer.invoke("relatorio:exportar-emprestimos"),
 });
