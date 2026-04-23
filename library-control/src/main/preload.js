@@ -8,8 +8,6 @@ contextBridge.exposeInMainWorld("api", {
   buscarUsuarios: (termo) => ipcRenderer.invoke("usuario:buscar", termo),
 
   listarEmprestimos: () => ipcRenderer.invoke("emprestimo:listar"),
-
-  listarEmprestimos: () => ipcRenderer.invoke("emprestimo:listar"),
   criarEmprestimo: (payload) => ipcRenderer.invoke("emprestimo:criar", payload),
   devolverEmprestimo: (id) => ipcRenderer.invoke("emprestimo:devolver", id),
   listarEmprestimosAtrasados: () =>
