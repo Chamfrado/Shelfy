@@ -119,3 +119,22 @@ function alertModal({ title = "Aviso", message = "" }) {
     });
   });
 }
+
+function showLoadingModal(message = "Processando...") {
+  const root = ensureModalRoot();
+
+  root.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal modal-loading">
+        <div class="modal-body loading-body">
+          <div class="spinner"></div>
+          <div class="loading-text">${message}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function hideLoadingModal() {
+  closeModal();
+}

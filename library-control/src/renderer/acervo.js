@@ -187,7 +187,10 @@ function renderAcervo(lista) {
 async function cancelarEdicaoLivro() {
   limparFormulario();
   await carregarAcervo();
-  setBoxStatus(statusLivro, "Edição cancelada.", "info");
+  await alertModal({
+    title: "Aviso",
+    message: "Edição cancelada.",
+  });
 }
 
 async function carregarAcervo() {
@@ -205,7 +208,10 @@ btnSelecionarImagem.addEventListener("click", async () => {
     const partes = caminho.split(/[/\\]/);
     nomeImagemSelecionada.textContent = partes[partes.length - 1];
   } catch (error) {
-    setStatus(error.message);
+    await alertModal({
+      title: "Erro",
+      message: error.message,
+    });
   }
 });
 
@@ -220,26 +226,38 @@ btnCriarLivro.addEventListener("click", async () => {
     const categoria = livroCategoria.value;
 
     if (!titulo) {
-      statusLivro.textContent = "Informe o título.";
+      await alertModal({
+        title: "Validação",
+        message: "Informe o título.",
+      });
       return;
     }
 
     if (!categoria || Number(categoria) < 1) {
-      statusLivro.textContent = "Informe uma categoria válida.";
+      await alertModal({
+        title: "Validação",
+        message: "Informe uma categoria válida.",
+      });
       return;
     }
 
     if (quantidade === "" || Number(quantidade) < 0) {
-      statusLivro.textContent = "Quantidade inválida.";
+      await alertModal({
+        title: "Validação",
+        message: "Quantidade inválida.",
+      });
       return;
     }
 
     if (!tipo || Number(tipo) < 1) {
-      statusLivro.textContent = "Informe um tipo válido.";
+      await alertModal({
+        title: "Validação",
+        message: "Informe um tipo válido.",
+      });
       return;
     }
 
-    setBoxStatus(statusLivro, "Processando...", "info");
+    showLoadingModal("Salvando livro...");
 
     let nomeImagem = null;
     if (caminhoImagemSelecionada) {
@@ -258,7 +276,12 @@ btnCriarLivro.addEventListener("click", async () => {
         tipo,
         capa: nomeImagem,
       });
-      setBoxStatus(statusLivro, "Livro atualizado com sucesso.", "success");
+
+      hideLoadingModal();
+      await alertModal({
+        title: "Sucesso",
+        message: "Livro atualizado com sucesso.",
+      });
     } else {
       await window.api.criarLivro({
         titulo,
@@ -270,13 +293,22 @@ btnCriarLivro.addEventListener("click", async () => {
         tipo,
         capa: nomeImagem,
       });
-      setBoxStatus(statusLivro, "Livro cadastrado com sucesso.", "success");
+
+      hideLoadingModal();
+      await alertModal({
+        title: "Sucesso",
+        message: "Livro cadastrado com sucesso.",
+      });
     }
 
     limparFormulario();
     await carregarAcervo();
   } catch (error) {
-    setBoxStatus(statusLivro, `Erro: ${error.message}`, "error");
+    hideLoadingModal();
+    await alertModal({
+      title: "Erro",
+      message: error.message,
+    });
   }
 });
 
@@ -343,9 +375,12 @@ btnCancelarEdicaoLivro.addEventListener("click", async () => {
   await cancelarEdicaoLivro();
 });
 
-btnLimparLivro.addEventListener("click", () => {
+btnLimparLivro.addEventListener("click", async () => {
   limparFormulario();
-  setBoxStatus(statusLivro, "Formulário limpo.", "info");
+  await alertModal({
+    title: "Aviso",
+    message: "Formulário limpo.",
+  });
 });
 
 (async function init() {

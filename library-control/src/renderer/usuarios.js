@@ -27,12 +27,10 @@ document.getElementById("app").innerHTML = getLayout(
       <label for="usuarioEmail">E-mail</label>
       <input id="usuarioEmail" placeholder="E-mail" />
       <div class="acoes-formulario">
-  <div class="acoes-formulario">
-  <button id="btnSalvarUsuario">Salvar usuário</button>
-  <button id="btnCancelarEdicaoUsuario" type="button" class="hidden">Cancelar edição</button>
-  <button id="btnLimparUsuario" type="button">Limpar formulário</button>
-</div>
-</div>
+        <button id="btnSalvarUsuario">Salvar usuário</button>
+        <button id="btnCancelarEdicaoUsuario" type="button" class="hidden">Cancelar edição</button>
+        <button id="btnLimparUsuario" type="button">Limpar formulário</button>
+      </div>
     </div>
 
     <div id="statusUsuario" class="status-box"></div>
@@ -175,7 +173,10 @@ function atualizarEstadoEdicaoUsuario() {
 async function cancelarEdicaoUsuario() {
   limparFormulario();
   await carregarUsuarios();
-  setBoxStatus(statusUsuario, "Edição cancelada.", "info");
+  await alertModal({
+    title: "Aviso",
+    message: "Edição cancelada.",
+  });
 }
 
 btnCancelarEdicaoUsuario.addEventListener("click", async () => {
@@ -198,19 +199,30 @@ btnSalvarUsuario.addEventListener("click", async () => {
     const email = usuarioEmail.value.trim();
 
     if (!nome) {
-      statusUsuario.textContent = "Informe o nome.";
+      await alertModal({
+        title: "Validação",
+        message: "Informe o nome.",
+      });
       return;
     }
 
     if (!login) {
-      statusUsuario.textContent = "Informe o login.";
+      await alertModal({
+        title: "Validação",
+        message: "Informe o login.",
+      });
       return;
     }
 
     if (nivel === "") {
-      statusUsuario.textContent = "Informe o nível.";
+      await alertModal({
+        title: "Validação",
+        message: "Informe o nível.",
+      });
       return;
     }
+
+    showLoadingModal("Salvando usuário...");
 
     if (usuarioEmEdicaoId) {
       await window.api.atualizarUsuario({
@@ -222,7 +234,12 @@ btnSalvarUsuario.addEventListener("click", async () => {
         fone,
         email,
       });
-      setBoxStatus(statusUsuario, "Usuário atualizado com sucesso.", "success");
+
+      hideLoadingModal();
+      await alertModal({
+        title: "Sucesso",
+        message: "Usuário atualizado com sucesso.",
+      });
     } else {
       await window.api.criarUsuario({
         nome,
@@ -232,17 +249,22 @@ btnSalvarUsuario.addEventListener("click", async () => {
         fone,
         email,
       });
-      setBoxStatus(statusUsuario, "Usuário cadastrado com sucesso.", "success");
+
+      hideLoadingModal();
+      await alertModal({
+        title: "Sucesso",
+        message: "Usuário cadastrado com sucesso.",
+      });
     }
 
     limparFormulario();
     await carregarUsuarios();
   } catch (error) {
-    setBoxStatus(
-      statusUsuario,
-      `Erro ao salvar usuário: ${error.message}`,
-      "error",
-    );
+    hideLoadingModal();
+    await alertModal({
+      title: "Erro",
+      message: error.message,
+    });
   }
 });
 
@@ -268,11 +290,13 @@ btnCancelarEdicaoUsuario.addEventListener("click", async () => {
   await cancelarEdicaoUsuario();
 });
 
-btnLimparUsuario.addEventListener("click", () => {
+btnLimparUsuario.addEventListener("click", async () => {
   limparFormulario();
-  setBoxStatus(statusUsuario, "Formulário limpo.", "info");
+  await alertModal({
+    title: "Aviso",
+    message: "Formulário limpo.",
+  });
 });
-
 (async function init() {
   try {
     setStatus("Carregando usuários...");
