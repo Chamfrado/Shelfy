@@ -43,4 +43,7 @@ contextBridge.exposeInMainWorld("api", {
   reiniciarAplicacao: () => ipcRenderer.invoke("sistema:reiniciar"),
   exportarEmprestimosPdf: () =>
     ipcRenderer.invoke("relatorio:exportar-emprestimos-pdf"),
+  listarAcervoComResumo: () => ipcRenderer.invoke("acervo:listar-com-resumo"),
+  listarUsuariosComResumo: () =>
+    ipcRenderer.invoke("usuario:listar-com-resumo"),
 });

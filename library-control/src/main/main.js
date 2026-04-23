@@ -12,6 +12,7 @@ const {
   listarCategoriasAcervo,
   listarTiposAcervo,
   buscarLivroPorId,
+  listarAcervoComResumo,
 } = require("./db/acervo.repo");
 const {
   listarUsuarios,
@@ -20,6 +21,7 @@ const {
   criarUsuario,
   atualizarUsuario,
   excluirUsuario,
+  listarUsuariosComResumo,
 } = require("./db/usuarios.repo");
 const {
   listarEmprestimos,
@@ -526,6 +528,14 @@ app.whenReady().then(() => {
       canceled: false,
       path: result.filePath,
     };
+  });
+
+  ipcMain.handle("acervo:listar-com-resumo", () => {
+    return listarAcervoComResumo();
+  });
+
+  ipcMain.handle("usuario:listar-com-resumo", () => {
+    return listarUsuariosComResumo();
   });
 
   createWindow();

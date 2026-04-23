@@ -175,6 +175,9 @@ function renderUsuarioSelecionado() {
     <div>Login: ${usuarioSelecionado.login ?? "-"}</div>
     <div>Nível: ${usuarioSelecionado.nivel ?? "-"}</div>
     <div>Turma: ${usuarioSelecionado.turma ?? "-"}</div>
+    <div>Histórico: ${usuarioSelecionado.total_emprestimos ?? 0} empréstimo(s)</div>
+    <div>Ativos: ${usuarioSelecionado.emprestimos_ativos ?? 0}</div>
+    <div>Atrasados: ${usuarioSelecionado.emprestimos_atrasados ?? 0}</div>
   `;
 }
 
@@ -199,6 +202,8 @@ function renderLivroSelecionado() {
         <div><strong>${livroSelecionado.titulo ?? ""}</strong></div>
         <div>Autor: ${livroSelecionado.autor ?? "-"}</div>
         <div>Disponível: ${livroSelecionado.quantidade ?? 0}</div>
+        <div>Total emprestado: ${livroSelecionado.total_emprestimos ?? 0}</div>
+        <div>Ativos agora: ${livroSelecionado.emprestimos_ativos ?? 0}</div>
       </div>
     </div>
   `;
@@ -306,7 +311,7 @@ async function buscarEmprestimosTela() {
 }
 
 async function selecionarUsuario() {
-  const usuarios = await window.api.listarUsuarios();
+  const usuarios = await window.api.listarUsuariosComResumo();
 
   const escolhido = await escolherItemModal({
     title: "Selecionar usuário",
@@ -319,6 +324,9 @@ async function selecionarUsuario() {
         <div class="modal-item-sub">Login: ${u.login ?? "-"}</div>
         <div class="modal-item-sub">Nível: ${u.nivel ?? "-"}</div>
         <div class="modal-item-sub">Turma: ${u.turma ?? "-"}</div>
+        <div class="modal-item-sub">Histórico: ${u.total_emprestimos ?? 0} empréstimo(s)</div>
+        <div class="modal-item-sub">Ativos: ${u.emprestimos_ativos ?? 0}</div>
+        <div class="modal-item-sub">Atrasados: ${u.emprestimos_atrasados ?? 0}</div>
       </div>
     `,
   });
@@ -328,9 +336,8 @@ async function selecionarUsuario() {
   usuarioSelecionado = escolhido;
   renderUsuarioSelecionado();
 }
-
 async function selecionarLivro() {
-  const livros = await window.api.listarAcervo();
+  const livros = await window.api.listarAcervoComResumo();
 
   const disponiveis = livros.filter(
     (livro) => Number(livro.quantidade ?? 0) > 0,
@@ -354,6 +361,8 @@ async function selecionarLivro() {
           <div class="modal-item-title">${l.titulo ?? ""}</div>
           <div class="modal-item-sub">Autor: ${l.autor ?? "-"}</div>
           <div class="modal-item-sub">Disponível: ${l.quantidade ?? 0}</div>
+          <div class="modal-item-sub">Total emprestado: ${l.total_emprestimos ?? 0}</div>
+          <div class="modal-item-sub">Ativos agora: ${l.emprestimos_ativos ?? 0}</div>
         </div>
       </div>
     `,

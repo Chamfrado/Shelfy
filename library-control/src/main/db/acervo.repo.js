@@ -184,6 +184,37 @@ function buscarLivroPorId(id) {
     .get(id);
 }
 
+function listarAcervoComResumo() {
+  const db = getDatabase();
+
+  const stmt = db.prepare(`
+    SELECT
+      a.id,
+      a.titulo,
+      a.autor,
+      a.editora,
+      a.isbn,
+      a.quantidade,
+      a.capa,
+      a.categoria,
+      a.tipo,
+      COUNT(e.id) AS total_emprestimos,
+      SUM(
+        CASE
+          WHEN lower(COALESCE(e.devolvido, '')) NOT LIKE '%sim%' THEN 1
+          ELSE 0
+        END
+      ) AS emprestimos_ativos
+    FROM cad_acervo a
+    LEFT JOIN emprestimos e ON e.acervo_id = a.id
+    GROUP BY
+      a.id, a.titulo, a.autor, a.editora, a.isbn, a.quantidade, a.capa, a.categoria, a.tipo
+    ORDER BY a.titulo
+  `);
+
+  return stmt.all();
+}
+
 module.exports = {
   listarAcervo,
   buscarAcervo,
@@ -194,4 +225,5 @@ module.exports = {
   listarCategoriasAcervo,
   listarTiposAcervo,
   buscarLivroPorId,
+  listarAcervoComResumo,
 };

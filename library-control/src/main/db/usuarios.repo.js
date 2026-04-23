@@ -129,6 +129,42 @@ function excluirUsuario(id) {
     .run(id);
 }
 
+function listarUsuariosComResumo() {
+  const db = getDatabase();
+
+  const stmt = db.prepare(`
+    SELECT
+      u.id,
+      u.nome,
+      u.login,
+      u.nivel,
+      u.turma,
+      u.fone,
+      u.email,
+      COUNT(e.id) AS total_emprestimos,
+      SUM(
+        CASE
+          WHEN lower(COALESCE(e.devolvido, '')) NOT LIKE '%sim%' THEN 1
+          ELSE 0
+        END
+      ) AS emprestimos_ativos,
+      SUM(
+        CASE
+          WHEN lower(COALESCE(e.devolvido, '')) NOT LIKE '%sim%'
+           AND date(e.data_devolucao) < date('now', 'localtime') THEN 1
+          ELSE 0
+        END
+      ) AS emprestimos_atrasados
+    FROM cad_usuario u
+    LEFT JOIN emprestimos e ON e.user_id = u.id
+    GROUP BY
+      u.id, u.nome, u.login, u.nivel, u.turma, u.fone, u.email
+    ORDER BY u.nome
+  `);
+
+  return stmt.all();
+}
+
 module.exports = {
   listarUsuarios,
   buscarUsuarios,
@@ -136,4 +172,5 @@ module.exports = {
   criarUsuario,
   atualizarUsuario,
   excluirUsuario,
+  listarUsuariosComResumo,
 };
