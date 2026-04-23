@@ -77,7 +77,7 @@ function confirmModal({ title = "Confirmar", message = "Deseja continuar?" }) {
       <div class="modal-overlay">
         <div class="modal">
           <div class="modal-header">${title}</div>
-          <div class="modal-body">${message}</div>
+          <div class="modal-body modal-message">${message}</div>
           <div class="modal-actions">
             <button id="modal-cancelar" class="btn-secondary">Cancelar</button>
             <button id="modal-confirmar" class="btn-danger">Confirmar</button>

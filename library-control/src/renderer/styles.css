@@ -542,3 +542,12 @@ td {
   font-size: 14px;
   color: #374151;
 }
+
+.modal-body {
+  white-space: pre-line;
+}
+
+.modal-message {
+  white-space: pre-line;
+  line-height: 1.5;
+}

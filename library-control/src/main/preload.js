@@ -58,4 +58,15 @@ contextBridge.exposeInMainWorld("api", {
   importarUsuariosCsv: () => ipcRenderer.invoke("importar:usuarios"),
 
   importarAcervoCsv: () => ipcRenderer.invoke("importar:acervo"),
+
+  previewImportarUsuariosCsv: () =>
+    ipcRenderer.invoke("importar:usuarios-preview"),
+
+  confirmarImportarUsuariosCsv: () =>
+    ipcRenderer.invoke("importar:usuarios-confirmar"),
+
+  previewImportarAcervoCsv: () => ipcRenderer.invoke("importar:acervo-preview"),
+
+  confirmarImportarAcervoCsv: () =>
+    ipcRenderer.invoke("importar:acervo-confirmar"),
 });

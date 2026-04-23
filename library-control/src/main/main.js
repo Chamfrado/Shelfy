@@ -56,6 +56,44 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "../renderer/index.html"));
 }
 
+function analisarAcervoCsv(arquivo) {
+  const conteudo = fs.readFileSync(arquivo, "utf8");
+  const { cabecalho, registros } = parseCsvConteudo(conteudo);
+
+  validarCabecalho(cabecalho, [
+    "titulo",
+    "autor",
+    "editora",
+    "isbn",
+    "quantidade",
+    "categoria",
+    "tipo",
+  ]);
+
+  let criados = 0;
+  let atualizados = 0;
+  let ignorados = 0;
+
+  registros.forEach((r) => {
+    if (!r.titulo || !r.quantidade || !r.categoria || !r.tipo) {
+      ignorados++;
+      return;
+    }
+
+    const existente = buscarLivroPorTitulo(r.titulo);
+
+    if (existente) atualizados++;
+    else criados++;
+  });
+
+  return {
+    total: registros.length,
+    criados,
+    atualizados,
+    ignorados,
+  };
+}
+
 function gerarPdfEmprestimos(dados, destino) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 40, size: "A4" });
@@ -164,6 +202,48 @@ function validarCabecalho(cabecalho, esperado) {
     );
   }
 }
+
+function analisarUsuariosCsv(arquivo) {
+  const conteudo = fs.readFileSync(arquivo, "utf8");
+  const { cabecalho, registros } = parseCsvConteudo(conteudo);
+
+  validarCabecalho(cabecalho, [
+    "nome",
+    "login",
+    "nivel",
+    "turma",
+    "fone",
+    "email",
+  ]);
+
+  let criados = 0;
+  let atualizados = 0;
+  let ignorados = 0;
+
+  registros.forEach((r) => {
+    if (!r.nome || !r.login || !r.nivel) {
+      ignorados++;
+      return;
+    }
+
+    const existente = buscarUsuarios(r.login).find(
+      (u) => String(u.login).toLowerCase() === String(r.login).toLowerCase(),
+    );
+
+    if (existente) atualizados++;
+    else criados++;
+  });
+
+  return {
+    total: registros.length,
+    criados,
+    atualizados,
+    ignorados,
+  };
+}
+
+let ultimoArquivoUsuariosImportacao = null;
+let ultimoArquivoAcervoImportacao = null;
 
 app.whenReady().then(() => {
   ipcMain.handle("acervo:listar", () => {
@@ -662,20 +742,12 @@ app.whenReady().then(() => {
     };
   });
 
-  ipcMain.handle("importar:usuarios", async () => {
-    const result = await dialog.showOpenDialog({
-      title: "Selecionar CSV de usuários",
-      properties: ["openFile"],
-      filters: [{ name: "CSV", extensions: ["csv"] }],
-    });
-
-    if (result.canceled || !result.filePaths.length) {
-      return { canceled: true };
+  ipcMain.handle("importar:usuarios-confirmar", async () => {
+    if (!ultimoArquivoUsuariosImportacao) {
+      throw new Error("Nenhum arquivo de usuários selecionado.");
     }
 
-    const arquivo = result.filePaths[0];
-    const conteudo = fs.readFileSync(arquivo, "utf8");
-
+    const conteudo = fs.readFileSync(ultimoArquivoUsuariosImportacao, "utf8");
     const { cabecalho, registros } = parseCsvConteudo(conteudo);
 
     validarCabecalho(cabecalho, [
@@ -710,12 +782,11 @@ app.whenReady().then(() => {
         email: r.email || null,
       });
 
-      if (existente) {
-        atualizados++;
-      } else {
-        criados++;
-      }
+      if (existente) atualizados++;
+      else criados++;
     });
+
+    ultimoArquivoUsuariosImportacao = null;
 
     return {
       canceled: false,
@@ -726,20 +797,12 @@ app.whenReady().then(() => {
     };
   });
 
-  ipcMain.handle("importar:acervo", async () => {
-    const result = await dialog.showOpenDialog({
-      title: "Selecionar CSV do acervo",
-      properties: ["openFile"],
-      filters: [{ name: "CSV", extensions: ["csv"] }],
-    });
-
-    if (result.canceled || !result.filePaths.length) {
-      return { canceled: true };
+  ipcMain.handle("importar:acervo-confirmar", async () => {
+    if (!ultimoArquivoAcervoImportacao) {
+      throw new Error("Nenhum arquivo de acervo selecionado.");
     }
 
-    const arquivo = result.filePaths[0];
-    const conteudo = fs.readFileSync(arquivo, "utf8");
-
+    const conteudo = fs.readFileSync(ultimoArquivoAcervoImportacao, "utf8");
     const { cabecalho, registros } = parseCsvConteudo(conteudo);
 
     validarCabecalho(cabecalho, [
@@ -775,12 +838,11 @@ app.whenReady().then(() => {
         capa: null,
       });
 
-      if (existente) {
-        atualizados++;
-      } else {
-        criados++;
-      }
+      if (existente) atualizados++;
+      else criados++;
     });
+
+    ultimoArquivoAcervoImportacao = null;
 
     return {
       canceled: false,
@@ -788,6 +850,44 @@ app.whenReady().then(() => {
       criados,
       atualizados,
       ignorados,
+    };
+  });
+
+  ipcMain.handle("importar:usuarios-preview", async () => {
+    const result = await dialog.showOpenDialog({
+      title: "Selecionar CSV de usuários",
+      properties: ["openFile"],
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePaths.length) {
+      return { canceled: true };
+    }
+
+    ultimoArquivoUsuariosImportacao = result.filePaths[0];
+
+    return {
+      canceled: false,
+      ...analisarUsuariosCsv(ultimoArquivoUsuariosImportacao),
+    };
+  });
+
+  ipcMain.handle("importar:acervo-preview", async () => {
+    const result = await dialog.showOpenDialog({
+      title: "Selecionar CSV do acervo",
+      properties: ["openFile"],
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePaths.length) {
+      return { canceled: true };
+    }
+
+    ultimoArquivoAcervoImportacao = result.filePaths[0];
+
+    return {
+      canceled: false,
+      ...analisarAcervoCsv(ultimoArquivoAcervoImportacao),
     };
   });
 

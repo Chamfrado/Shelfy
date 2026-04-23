@@ -78,29 +78,42 @@ const btnImportarAcervoCsv = document.getElementById("btnImportarAcervoCsv");
 
 btnImportarAcervoCsv.addEventListener("click", async () => {
   try {
+    showLoadingModal("Analisando arquivo de acervo...");
+
+    const preview = await window.api.previewImportarAcervoCsv();
+
+    hideLoadingModal();
+
+    if (preview?.canceled) return;
+
     const confirmado = await confirmModal({
-      title: "Importar acervo",
-      message:
-        "Selecione um arquivo CSV no modelo correto. Itens com o mesmo título serão atualizados. Deseja continuar?",
+      title: "Confirmar importação de acervo",
+      message: `Registros identificados: ${preview.total}
+
+                Serão criados: ${preview.criados}
+                Serão atualizados: ${preview.atualizados}
+                Serão ignorados: ${preview.ignorados}
+
+                Deseja continuar?`,
     });
 
     if (!confirmado) return;
 
     showLoadingModal("Importando acervo...");
 
-    const resultado = await window.api.importarAcervoCsv();
+    const resultado = await window.api.confirmarImportarAcervoCsv();
 
     hideLoadingModal();
 
-    if (resultado?.canceled) return;
-
     await alertModal({
       title: "Importação concluída",
-      message:
-        `Registros identificados: ${resultado.total}\n\n` +
-        `Criados: ${resultado.criados}\n` +
-        `Atualizados: ${resultado.atualizados}\n` +
-        `Ignorados: ${resultado.ignorados}`,
+      message: `Registros identificados: ${preview.total}
+
+                Serão criados: ${preview.criados}
+                Serão atualizados: ${preview.atualizados}
+                Serão ignorados: ${preview.ignorados}
+                    
+                Deseja continuar?`,
     });
   } catch (error) {
     hideLoadingModal();
@@ -111,24 +124,33 @@ btnImportarAcervoCsv.addEventListener("click", async () => {
     });
   }
 });
-
 btnImportarUsuariosCsv.addEventListener("click", async () => {
   try {
+    showLoadingModal("Analisando arquivo de usuários...");
+
+    const preview = await window.api.previewImportarUsuariosCsv();
+
+    hideLoadingModal();
+
+    if (preview?.canceled) return;
+
     const confirmado = await confirmModal({
-      title: "Importar usuários",
+      title: "Confirmar importação de usuários",
       message:
-        "Selecione um arquivo CSV no modelo correto. Usuários com o mesmo login serão atualizados. Deseja continuar?",
+        `Registros identificados: ${preview.total}\n\n` +
+        `Serão criados: ${preview.criados}\n` +
+        `Serão atualizados: ${preview.atualizados}\n` +
+        `Serão ignorados: ${preview.ignorados}\n\n` +
+        `Deseja continuar?`,
     });
 
     if (!confirmado) return;
 
     showLoadingModal("Importando usuários...");
 
-    const resultado = await window.api.importarUsuariosCsv();
+    const resultado = await window.api.confirmarImportarUsuariosCsv();
 
     hideLoadingModal();
-
-    if (resultado?.canceled) return;
 
     await alertModal({
       title: "Importação concluída",
