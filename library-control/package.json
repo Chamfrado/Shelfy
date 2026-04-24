@@ -10,7 +10,25 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "postinstall": "npm run rebuild"
+    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "br.com.bibliotecario.desktop",
+    "productName": "Bibliotecário Desktop",
+    "win": {
+      "target": "nsis"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "bibliotecario.db",
+        "to": "bibliotecario.db"
+      }
+    ]
   },
   "keywords": [],
   "author": {

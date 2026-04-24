@@ -201,7 +201,7 @@ function renderLivroSelecionado() {
       <div>
         ${
           livroSelecionado.capa
-            ? `<img src="./assets/livros/${encodeURIComponent(livroSelecionado.capa)}" alt="Capa" class="selecionado-capa" />`
+            ? `<img src="${getCapaLivroUrl(livroSelecionado.capa)}" alt="Capa" class="selecionado-capa" />`
             : `<div class="selecionado-capa sem-capa">Sem capa</div>`
         }
       </div>
@@ -408,7 +408,7 @@ async function selecionarLivro() {
           <div>
             ${
               l.capa
-                ? `<img src="./assets/livros/${encodeURIComponent(l.capa)}" alt="Capa" class="modal-item-capa" />`
+                ? `<img src="${getCapaLivroUrl(l.capa)}" alt="Capa" class="modal-item-capa" />`
                 : `<div class="modal-item-capa sem-capa">Sem capa</div>`
             }
           </div>

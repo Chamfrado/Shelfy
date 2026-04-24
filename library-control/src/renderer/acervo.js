@@ -131,7 +131,7 @@ function renderAcervo(lista) {
             <td>
               ${
                 l.capa
-                  ? `<img src="./assets/livros/${encodeURIComponent(l.capa)}" alt="Capa" class="capa-livro" />`
+                  ? `<img src="${getCapaLivroUrl(l.capa)}" alt="Capa" class="capa-livro" />`
                   : "-"
               }
             </td>
@@ -169,9 +169,7 @@ function renderAcervo(lista) {
       livroTipo.value = livro.tipo ?? "";
       nomeImagemSelecionada.textContent = livro.capa || "Nenhuma imagem";
       if (livro.capa) {
-        mostrarPreviewImagem(
-          `./assets/livros/${encodeURIComponent(livro.capa)}`,
-        );
+        mostrarPreviewImagem(getCapaLivroUrl(livro.capa));
       } else {
         esconderPreviewImagem();
       }

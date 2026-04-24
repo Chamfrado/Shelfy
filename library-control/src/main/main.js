@@ -1,6 +1,15 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  protocol,
+  net,
+} = require("electron");
 const path = require("node:path");
 const PDFDocument = require("pdfkit");
+
+const { pathToFileURL } = require("node:url");
 
 const {
   listarAcervo,
@@ -265,7 +274,66 @@ function analisarUsuariosCsv(arquivo) {
 let ultimoArquivoUsuariosImportacao = null;
 let ultimoArquivoAcervoImportacao = null;
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "livro-img",
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+    },
+  },
+]);
+
+function getLivrosImagesDir() {
+  return path.join(app.getPath("userData"), "livros");
+}
+
+function garantirPastaImagensLivros() {
+  const dir = getLivrosImagesDir();
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  return dir;
+}
+
+function migrarImagensAntigas() {
+  const destinoDir = garantirPastaImagensLivros();
+  const origemDir = path.join(__dirname, "../renderer/assets/livros");
+
+  if (!fs.existsSync(origemDir)) return;
+
+  const arquivos = fs.readdirSync(origemDir);
+
+  arquivos.forEach((arquivo) => {
+    const origem = path.join(origemDir, arquivo);
+    const destino = path.join(destinoDir, arquivo);
+
+    if (!fs.existsSync(destino) && fs.statSync(origem).isFile()) {
+      fs.copyFileSync(origem, destino);
+    }
+  });
+}
+
 app.whenReady().then(() => {
+  garantirPastaImagensLivros();
+  migrarImagensAntigas();
+
+  protocol.handle("livro-img", (request) => {
+    const url = new URL(request.url);
+    const nomeArquivo = decodeURIComponent(url.pathname.replace("/", ""));
+
+    const caminho = path.join(getLivrosImagesDir(), nomeArquivo);
+
+    if (!fs.existsSync(caminho)) {
+      return new Response("Imagem não encontrada", { status: 404 });
+    }
+
+    return net.fetch(pathToFileURL(caminho).toString());
+  });
+
   ipcMain.handle("acervo:listar", () => {
     return listarAcervo();
   });
@@ -386,11 +454,8 @@ app.whenReady().then(() => {
     const nomeSeguro = nomeOriginal.replace(/[^\w\s()-]/g, "").trim();
     const nomeFinal = `${prefixo}_${nomeSeguro}${ext}`;
 
-    const destino = path.join(
-      __dirname,
-      "../renderer/assets/livros",
-      nomeFinal,
-    );
+    const destinoDir = garantirPastaImagensLivros();
+    const destino = path.join(destinoDir, nomeFinal);
 
     fs.copyFileSync(filePath, destino);
 
@@ -415,11 +480,7 @@ app.whenReady().then(() => {
     const capaNova = payload.capa;
 
     if (capaAntiga && capaNova && capaAntiga !== capaNova) {
-      const caminhoAntigo = path.join(
-        __dirname,
-        "../renderer/assets/livros",
-        capaAntiga,
-      );
+      const caminhoAntigo = path.join(getLivrosImagesDir(), capaAntiga);
 
       if (fs.existsSync(caminhoAntigo)) {
         fs.unlinkSync(caminhoAntigo);

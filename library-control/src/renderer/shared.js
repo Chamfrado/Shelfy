@@ -320,6 +320,11 @@ function updateLoadingModal(message = "Processando...") {
   }
 }
 
+function getCapaLivroUrl(nomeArquivo) {
+  if (!nomeArquivo) return "";
+  return `livro-img://livros/${encodeURIComponent(nomeArquivo)}`;
+}
+
 function hideLoadingModal() {
   closeModal();
 }
