@@ -1,62 +1,111 @@
 document.getElementById("app").innerHTML = getLayout(
   "acervo",
   `
-    <h2>Acervo</h2>
+  <div class="page-header">
+    <div>
+      <h1>Acervo</h1>
+      <p>Cadastre, edite e acompanhe os itens da biblioteca.</p>
+    </div>
+  </div>
 
-    <h3>Cadastrar livro</h3>
+  <section class="page-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2 id="tituloFormularioLivro">Cadastrar livro</h2>
+          <p>Preencha as informações do item do acervo.</p>
+        </div>
+      </div>
 
-<div class="form-box">
-  <label for="livroTitulo">Título</label>
-  <input id="livroTitulo" placeholder="Título" />
-  <label for="livroAutor">Autor</label>
-  <input id="livroAutor" placeholder="Autor" />
-  <label for="livroEditora">Editora</label>
-  <input id="livroEditora" placeholder="Editora" />
-  <label for="livroIsbn">ISBN</label>
-  <input id="livroIsbn" placeholder="ISBN" />
-  <label for="livroQuantidade">Quantidade</label>
-  <input id="livroQuantidade" type="number" placeholder="Quantidade" min="0" />
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="livroTitulo">Título</label>
+          <input id="livroTitulo" placeholder="Título do livro" />
+        </div>
 
-  <label for="livroCategoria">Categoria</label>
-  <select id="livroCategoria">
-    <option value="">Selecione uma categoria</option>
-  </select>
-  <small class="hint">Escolha a categoria do acervo.</small>
+        <div class="form-field">
+          <label for="livroAutor">Autor</label>
+          <input id="livroAutor" placeholder="Autor" />
+        </div>
 
-  <label for="livroTipo">Tipo de acervo</label>
-  <select id="livroTipo">
-    <option value="">Selecione um tipo</option>
-  </select>
-  <small class="hint">Ex.: Livro, Apostila, Revista, Jornal, Gibi.</small>
+        <div class="form-field">
+          <label for="livroEditora">Editora</label>
+          <input id="livroEditora" placeholder="Editora" />
+        </div>
 
-   <button id="btnSelecionarImagem" type="button">Selecionar imagem</button>
-  <span id="nomeImagemSelecionada">Nenhuma imagem</span>
-  <div id="previewImagemWrapper" class="hidden">
-  <p><strong>Pré-visualização da capa</strong></p>
-  <img id="previewImagemLivro" class="capa-preview" alt="Pré-visualização da capa" />
-</div>
-  <div class="acoes-formulario">
- 
-    <button id="btnCriarLivro">Salvar livro</button>
-  <button id="btnCancelarEdicaoLivro" type="button" class="hidden">Cancelar edição</button>
-  <button id="btnLimparLivro" type="button">Limpar formulário</button>
-</div>
+        <div class="form-field">
+          <label for="livroIsbn">ISBN</label>
+          <input id="livroIsbn" placeholder="ISBN" />
+        </div>
 
-</div>
+        <div class="form-field">
+          <label for="livroQuantidade">Quantidade</label>
+          <input id="livroQuantidade" type="number" placeholder="Quantidade" min="0" />
+        </div>
 
-<div id="statusLivro" class="status-box"></div>
-    <hr />
+        <div class="form-field">
+          <label for="livroCategoria">Categoria</label>
+          <select id="livroCategoria">
+            <option value="">Selecione uma categoria</option>
+          </select>
+        </div>
 
-    <div class="toolbar">
-      <input id="busca" placeholder="Buscar por título ou autor..." />
-      <button id="btnBuscar">Buscar</button>
+        <div class="form-field">
+          <label for="livroTipo">Tipo de acervo</label>
+          <select id="livroTipo">
+            <option value="">Selecione um tipo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cover-upload-card">
+        <div>
+          <h3>Capa do livro</h3>
+          <p>Selecione uma imagem JPG, JPEG ou PNG para representar o item.</p>
+
+          <div class="actions-row">
+            <button id="btnSelecionarImagem" type="button" class="btn-light">
+              Selecionar imagem
+            </button>
+            <span id="nomeImagemSelecionada" class="muted-text">Nenhuma imagem</span>
+          </div>
+        </div>
+
+        <div id="previewImagemWrapper" class="cover-preview-box hidden">
+          <img id="previewImagemLivro" class="capa-preview" alt="Pré-visualização da capa" />
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button id="btnCriarLivro" class="btn-primary">Salvar livro</button>
+        <button id="btnCancelarEdicaoLivro" type="button" class="btn-secondary hidden">Cancelar edição</button>
+        <button id="btnLimparLivro" type="button" class="btn-light">Limpar</button>
+      </div>
+
+      <div id="statusLivro" class="status-box"></div>
     </div>
 
-    <div id="resultado"></div>
-  `,
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Buscar no acervo</h2>
+          <p>Pesquise por título ou autor.</p>
+        </div>
+      </div>
+
+      <div class="toolbar modern-toolbar">
+        <input id="busca" placeholder="Buscar por título ou autor..." />
+        <button id="btnBuscar" class="btn-primary">Buscar</button>
+      </div>
+
+      <div id="resultado"></div>
+    </div>
+  </section>
+`,
 );
 
 const resultadoEl = document.getElementById("resultado");
+const tituloFormularioLivro = document.getElementById("tituloFormularioLivro");
 const inputBusca = document.getElementById("busca");
 const btnBuscar = document.getElementById("btnBuscar");
 
@@ -106,10 +155,23 @@ function limparFormulario() {
   statusLivro.textContent = "";
 }
 
+function renderStatusAcervo(qtd) {
+  if (qtd <= 0) {
+    return `<span class="badge-status badge-atrasado">Indisponível</span>`;
+  }
+
+  if (qtd === 1) {
+    return `<span class="badge-status badge-vencendo">Última unidade</span>`;
+  }
+
+  return `<span class="badge-status badge-devolvido">Disponível</span>`;
+}
+
 function renderAcervo(lista) {
   resultadoEl.innerHTML = `
     <h2>Acervo - Total: ${lista.length}</h2>
-    <table>
+   <div class="table-wrapper">
+<table class="modern-table">
       <tr>
         <th>Capa</th>
         <th>Título</th>
@@ -141,17 +203,20 @@ function renderAcervo(lista) {
             <td>${l.categoria_nome ?? l.categoria ?? "-"}</td>
             <td>${l.tipo_nome ?? l.tipo ?? "-"}</td>
             <td>${qtd}</td>
-            <td>${status}</td>
+            <td>${renderStatusAcervo(qtd)}</td>
             <td>
-              <button class="btn-historico-livro" data-id="${l.id}">Histórico</button>
-              <button class="btn-editar" data-id="${l.id}">Editar</button>
-              <button class="btn-excluir" data-id="${l.id}">Excluir</button>
+              <div class="table-actions">
+                <button class="btn-light btn-historico-livro" data-id="${l.id}">Histórico</button>
+                <button class="btn-light btn-editar" data-id="${l.id}">Editar</button>
+                <button class="btn-danger btn-excluir" data-id="${l.id}">Excluir</button>
+              </div>
             </td>
           </tr>
         `;
         })
         .join("")}
     </table>
+</div>
   `;
 
   document.querySelectorAll(".btn-editar").forEach((btn) => {
@@ -400,9 +465,11 @@ function atualizarEstadoEdicaoLivro() {
   if (livroEmEdicaoId) {
     btnCancelarEdicaoLivro.classList.remove("hidden");
     btnCriarLivro.textContent = "Atualizar livro";
+    tituloFormularioLivro.textContent = "Editar livro";
   } else {
     btnCancelarEdicaoLivro.classList.add("hidden");
     btnCriarLivro.textContent = "Salvar livro";
+    tituloFormularioLivro.textContent = "Cadastrar livro";
   }
 }
 

@@ -919,3 +919,51 @@ body {
   background: #dbeafe;
   color: #1e40af;
 }
+
+.cover-upload-card {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.cover-upload-card h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.cover-upload-card p {
+  margin: 6px 0 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.cover-preview-box {
+  padding: 8px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.muted-text {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.modern-table .capa-livro {
+  width: 42px;
+  height: 60px;
+  border-radius: 8px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
