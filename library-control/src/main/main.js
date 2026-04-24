@@ -763,8 +763,25 @@ app.whenReady().then(() => {
     let atualizados = 0;
     let ignorados = 0;
 
+    let erros = [];
+
     registros.forEach((r, index) => {
-      if (!r.nome || !r.login || !r.nivel) {
+      const linha = index + 2; // +2 por causa do cabeçalho
+
+      if (!r.nome) {
+        erros.push(`Linha ${linha}: nome vazio`);
+        ignorados++;
+        return;
+      }
+
+      if (!r.login) {
+        erros.push(`Linha ${linha}: login vazio`);
+        ignorados++;
+        return;
+      }
+
+      if (!r.nivel || ![1, 2, 3].includes(Number(r.nivel))) {
+        erros.push(`Linha ${linha}: nível inválido (use 1, 2 ou 3)`);
         ignorados++;
         return;
       }
@@ -800,6 +817,7 @@ app.whenReady().then(() => {
       criados,
       atualizados,
       ignorados,
+      erros,
     };
   });
 
@@ -825,8 +843,31 @@ app.whenReady().then(() => {
     let atualizados = 0;
     let ignorados = 0;
 
+    let erros = [];
+
     registros.forEach((r, index) => {
-      if (!r.titulo || !r.quantidade || !r.categoria || !r.tipo) {
+      const linha = index + 2;
+
+      if (!r.titulo) {
+        erros.push(`Linha ${linha}: título vazio`);
+        ignorados++;
+        return;
+      }
+
+      if (!r.quantidade || isNaN(Number(r.quantidade))) {
+        erros.push(`Linha ${linha}: quantidade inválida`);
+        ignorados++;
+        return;
+      }
+
+      if (!r.categoria || isNaN(Number(r.categoria))) {
+        erros.push(`Linha ${linha}: categoria inválida`);
+        ignorados++;
+        return;
+      }
+
+      if (!r.tipo || isNaN(Number(r.tipo))) {
+        erros.push(`Linha ${linha}: tipo inválido`);
         ignorados++;
         return;
       }
@@ -862,6 +903,7 @@ app.whenReady().then(() => {
       criados,
       atualizados,
       ignorados,
+      erros,
     };
   });
 

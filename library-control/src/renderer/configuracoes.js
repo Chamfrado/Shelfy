@@ -117,13 +117,14 @@ btnImportarAcervoCsv.addEventListener("click", async () => {
 
     await alertModal({
       title: "Importação concluída",
-      message: `Registros identificados: ${preview.total}
-
-                Serão criados: ${preview.criados}
-                Serão atualizados: ${preview.atualizados}
-                Serão ignorados: ${preview.ignorados}
-                    
-                Deseja continuar?`,
+      message:
+        `Registros identificados: ${resultado.total}\n\n` +
+        `Criados: ${resultado.criados}\n` +
+        `Atualizados: ${resultado.atualizados}\n` +
+        `Ignorados: ${resultado.ignorados}\n\n` +
+        (resultado.erros?.length
+          ? `Erros:\n${resultado.erros.slice(0, 10).join("\n")}`
+          : "Sem erros."),
     });
   } catch (error) {
     hideLoadingModal();
@@ -168,7 +169,10 @@ btnImportarUsuariosCsv.addEventListener("click", async () => {
         `Registros identificados: ${resultado.total}\n\n` +
         `Criados: ${resultado.criados}\n` +
         `Atualizados: ${resultado.atualizados}\n` +
-        `Ignorados: ${resultado.ignorados}`,
+        `Ignorados: ${resultado.ignorados}\n\n` +
+        (resultado.erros?.length
+          ? `Erros:\n${resultado.erros.slice(0, 10).join("\n")}`
+          : "Sem erros."),
     });
   } catch (error) {
     hideLoadingModal();
