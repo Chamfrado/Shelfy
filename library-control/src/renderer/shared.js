@@ -13,7 +13,7 @@ function getLayout(active, content) {
           ${navLink("usuarios", "Users", "users")}
           ${navLink("acervo", "Acervo", "books")}
           ${navLink("emprestimos", "Loans", "loans")}
-          ${navLink("inadimplentes", "Overdue", "alert")}
+          ${navLink("inadimplentes", "Inadimplentes", "alert")}
           ${navLink("configuracoes", "Settings", "settings")}
           ${navLink("creditos", "Credits", "user")}
         </nav>

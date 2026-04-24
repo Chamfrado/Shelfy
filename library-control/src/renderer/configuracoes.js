@@ -1,55 +1,97 @@
 document.getElementById("app").innerHTML = getLayout(
   "configuracoes",
   `
-    <h2>Configurações</h2>
-    <hr />
+  <div class="page-header">
+    <div>
+      <h1>Configurações</h1>
+      <p>Gerencie importações, relatórios e backups do sistema.</p>
+    </div>
+  </div>
 
+  <section class="config-grid">
 
+    <!-- IMPORTAÇÃO -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Importação de dados</h2>
+          <p>Importe usuários e acervo via CSV.</p>
+        </div>
+      </div>
 
-<h3>Modelos e Importação</h3>
+      <div class="actions-grid">
+        <button id="btnImportarUsuarios" class="btn-primary">
+          Importar usuários
+        </button>
 
-<h4>Modelos para importação</h4>
-<div class="form-box">
-  <button id="btnBaixarModeloAcervo">Baixar modelo de Acervo (CSV)</button>
-  <button id="btnBaixarModeloUsuarios">Baixar modelo de Usuários (CSV)</button>
-</div>
+        <button id="btnImportarAcervo" class="btn-primary">
+          Importar acervo
+        </button>
 
-<h4>Importar usuários</h4>
-<div class="form-box">
-  <button id="btnImportarUsuariosCsv">Importar Usuários (CSV)</button>
-  <button id="btnImportarAcervoCsv">Importar Acervo (CSV)</button>
-</div>
+        <button id="btnModeloUsuarios" class="btn-light">
+          Baixar modelo usuários
+        </button>
 
-
-
-
-<hr />
-
-<h3>Relatórios</h3>
-
-<div class="form-box">
-  <button id="btnExportarAcervoCsv">Exportar Acervo (CSV)</button>
-  <button id="btnExportarUsuariosCsv">Exportar Usuários (CSV)</button>
-  <button id="btnExportarEmprestimosCsv">Exportar Empréstimos (CSV)</button>
-  <button id="btnExportarEmprestimosPdf">Exportar Empréstimos (PDF)</button>
-</div>
-  <hr />
-    <h3>Backup do banco de dados</h3>
-    <div class="form-box">
-      <button id="btnFazerBackup">Fazer backup do banco</button>
-      <button id="btnRestaurarBackup">Restaurar backup</button>
-      <button id="btnAbrirBackups">Abrir pasta de backups</button>
+        <button id="btnModeloAcervo" class="btn-light">
+          Baixar modelo acervo
+        </button>
+      </div>
     </div>
 
-    <div class="status-box">
-      <p>
-        Use <strong>Fazer backup</strong> para salvar uma cópia do banco atual.
-      </p>
-      <p>
-        Use <strong>Restaurar backup</strong> para substituir o banco atual por um arquivo de backup.
-      </p>
+    <!-- RELATÓRIOS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Relatórios</h2>
+          <p>Exporte dados do sistema.</p>
+        </div>
+      </div>
+
+      <div class="actions-grid">
+        <button id="btnExportarAcervo" class="btn-light">
+          Exportar acervo (CSV)
+        </button>
+
+        <button id="btnExportarUsuarios" class="btn-light">
+          Exportar usuários (CSV)
+        </button>
+
+        <button id="btnExportarEmprestimos" class="btn-light">
+          Exportar empréstimos (CSV)
+        </button>
+
+        <button id="btnExportarEmprestimosPdf" class="btn-primary">
+          Gerar PDF de empréstimos
+        </button>
+      </div>
     </div>
-  `,
+
+    <!-- BACKUP -->
+    <div class="panel danger-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Backup e restauração</h2>
+          <p>Proteja e recupere seus dados.</p>
+        </div>
+      </div>
+
+      <div class="actions-grid">
+        <button id="btnBackup" class="btn-primary">
+          Fazer backup manual
+        </button>
+
+        <button id="btnRestaurarBackup" class="btn-danger">
+          Restaurar backup
+        </button>
+
+        <button id="btnAbrirBackups" class="btn-light">
+          Abrir pasta de backups
+        </button>
+      </div>
+    </div>
+
+  </section>
+`,
 );
 
 const btnFazerBackup = document.getElementById("btnFazerBackup");

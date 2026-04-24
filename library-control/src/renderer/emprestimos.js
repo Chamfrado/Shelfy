@@ -1,54 +1,92 @@
 document.getElementById("app").innerHTML = getLayout(
   "emprestimos",
   `
-    <h2>Criar empréstimo</h2>
+  <div class="page-header">
+    <div>
+      <h1>Empréstimos</h1>
+      <p>Crie novos empréstimos, acompanhe prazos e registre devoluções.</p>
+    </div>
+  </div>
 
-    <div class="form-box">
-      <label>Usuário</label>
-      <div class="acoes-formulario">
-        <button id="btnSelecionarUsuario" type="button">Pesquisar usuário</button>
-      </div>
-      <div id="usuarioSelecionadoCard" class="selecionado-card vazio">
-        Nenhum usuário selecionado
-      </div>
-
-      <label>Livro</label>
-      <div class="acoes-formulario">
-        <button id="btnSelecionarLivro" type="button">Pesquisar livro</button>
-      </div>
-      <div id="livroSelecionadoCard" class="selecionado-card vazio">
-        Nenhum livro selecionado
+  <section class="page-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Novo empréstimo</h2>
+          <p>Selecione um usuário e um livro para iniciar o empréstimo.</p>
+        </div>
       </div>
 
-      <label for="inputDias">Quantidade de dias</label>
-      <input type="number" id="inputDias" min="1" value="7" />
+      <div class="loan-selection-grid">
+        <div>
+          <div class="selection-header">
+            <span>Usuário</span>
+            <button id="btnSelecionarUsuario" type="button" class="btn-light">
+              Pesquisar usuário
+            </button>
+          </div>
 
-      <button id="btnCriarEmprestimo">Criar empréstimo</button>
+          <div id="usuarioSelecionadoCard" class="selecionado-card vazio">
+            Nenhum usuário selecionado
+          </div>
+        </div>
+
+        <div>
+          <div class="selection-header">
+            <span>Livro</span>
+            <button id="btnSelecionarLivro" type="button" class="btn-light">
+              Pesquisar livro
+            </button>
+          </div>
+
+          <div id="livroSelecionadoCard" class="selecionado-card vazio">
+            Nenhum livro selecionado
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid compact-grid">
+        <div class="form-field">
+          <label for="inputDias">Quantidade de dias</label>
+          <input type="number" id="inputDias" min="1" value="7" />
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button id="btnCriarEmprestimo" class="btn-primary">Criar empréstimo</button>
+      </div>
+
+      <div id="statusEmprestimo" class="status-box"></div>
     </div>
 
-    <div id="statusEmprestimo" class="status-box"></div>
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Lista de empréstimos</h2>
+          <p>Pesquise por usuário, livro ou filtre por status.</p>
+        </div>
+      </div>
 
-    <hr />
+      <div class="toolbar modern-toolbar">
+        <input
+          id="buscaEmprestimo"
+          placeholder="Buscar por usuário ou livro..."
+        />
 
-    <h2>Empréstimos</h2>
-    <div class="toolbar">
-      <input
-        id="buscaEmprestimo"
-        placeholder="Buscar por usuário ou livro..."
-      />
+        <select id="filtroStatusEmprestimo">
+          <option value="todos">Todos</option>
+          <option value="ativos">Ativos</option>
+          <option value="devolvidos">Devolvidos</option>
+          <option value="atrasados">Atrasados</option>
+        </select>
 
-      <select id="filtroStatusEmprestimo">
-        <option value="todos">Todos</option>
-        <option value="ativos">Ativos</option>
-        <option value="devolvidos">Devolvidos</option>
-        <option value="atrasados">Atrasados</option>
-      </select>
+        <button id="btnBuscarEmprestimos" class="btn-primary">Buscar</button>
+      </div>
 
-      <button id="btnBuscarEmprestimos">Buscar</button>
+      <div id="resultadoEmprestimos"></div>
     </div>
-
-    <div id="resultadoEmprestimos"></div>
-  `,
+  </section>
+`,
 );
 
 const inputDias = document.getElementById("inputDias");
@@ -226,7 +264,8 @@ function renderLivroSelecionado() {
 function renderEmprestimos(lista) {
   resultadoEmprestimosEl.innerHTML = `
     <h2>Empréstimos - Total: ${lista.length}</h2>
-    <table>
+    <div class="table-wrapper">
+<table class="modern-table">
       <tr>
         <th>Usuário</th>
         <th>Livro</th>
@@ -252,18 +291,21 @@ function renderEmprestimos(lista) {
               </span>
             </td>
             <td>${info.prazoTexto}</td>
-            <td>
-              ${
-                info.jaDevolvido
-                  ? "-"
-                  : `<button class="btn-devolver" data-id="${e.id}">Devolver</button>`
-              }
-            </td>
+           <td>
+  <div class="table-actions">
+    ${
+      info.jaDevolvido
+        ? `<span class="muted-text">-</span>`
+        : `<button class="btn-light btn-devolver" data-id="${e.id}">Devolver</button>`
+    }
+  </div>
+</td>
           </tr>
         `;
         })
         .join("")}
-    </table>
+   </table>
+</div>
   `;
 
   document.querySelectorAll(".btn-devolver").forEach((botao) => {
