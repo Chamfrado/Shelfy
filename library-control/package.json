@@ -25,9 +25,9 @@
     ],
     "extraResources": [
       {
-        "from": "bibliotecario.db",
-        "to": "bibliotecario.db"
-      }
+    "from": "src/main/db/migrations",
+    "to": "migrations"
+  }
     ]
   },
   "keywords": [],
