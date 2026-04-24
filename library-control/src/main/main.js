@@ -15,6 +15,8 @@ const {
   listarAcervoComResumo,
   upsertLivroPorTitulo,
   buscarLivroPorTitulo,
+  categoriaExiste,
+  tipoExiste,
 } = require("./db/acervo.repo");
 const {
   listarUsuarios,
@@ -76,6 +78,21 @@ function analisarAcervoCsv(arquivo) {
 
   registros.forEach((r) => {
     if (!r.titulo || !r.quantidade || !r.categoria || !r.tipo) {
+      ignorados++;
+      return;
+    }
+
+    if (isNaN(Number(r.quantidade))) {
+      ignorados++;
+      return;
+    }
+
+    if (isNaN(Number(r.categoria)) || !categoriaExiste(Number(r.categoria))) {
+      ignorados++;
+      return;
+    }
+
+    if (isNaN(Number(r.tipo)) || !tipoExiste(Number(r.tipo))) {
       ignorados++;
       return;
     }
@@ -866,8 +883,20 @@ app.whenReady().then(() => {
         return;
       }
 
+      if (!categoriaExiste(Number(r.categoria))) {
+        erros.push(`Linha ${linha}: categoria não encontrada no sistema`);
+        ignorados++;
+        return;
+      }
+
       if (!r.tipo || isNaN(Number(r.tipo))) {
         erros.push(`Linha ${linha}: tipo inválido`);
+        ignorados++;
+        return;
+      }
+
+      if (!tipoExiste(Number(r.tipo))) {
+        erros.push(`Linha ${linha}: tipo não encontrado no sistema`);
         ignorados++;
         return;
       }
@@ -942,6 +971,42 @@ app.whenReady().then(() => {
     return {
       canceled: false,
       ...analisarAcervoCsv(ultimoArquivoAcervoImportacao),
+    };
+  });
+
+  ipcMain.handle("importar:exportar-erros", async (_, erros) => {
+    if (!erros || !erros.length) {
+      throw new Error("Não há erros para exportar.");
+    }
+
+    const result = await dialog.showSaveDialog({
+      title: "Salvar erros da importação",
+      defaultPath: "erros-importacao.csv",
+      filters: [{ name: "CSV", extensions: ["csv"] }],
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+
+    const linhas = ["linha;erro"];
+
+    erros.forEach((erro) => {
+      // erro vem como: "Linha 8: login vazio"
+      const match = erro.match(/Linha (\d+): (.*)/);
+
+      if (match) {
+        linhas.push(`${match[1]};${match[2]}`);
+      } else {
+        linhas.push(`;${erro}`);
+      }
+    });
+
+    fs.writeFileSync(result.filePath, linhas.join("\n"), "utf8");
+
+    return {
+      canceled: false,
+      path: result.filePath,
     };
   });
 

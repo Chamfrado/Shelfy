@@ -254,6 +254,22 @@ function upsertLivroPorTitulo(dados) {
   return criarLivro(dados);
 }
 
+function categoriaExiste(id) {
+  const db = getDatabase();
+
+  return !!db
+    .prepare("SELECT 1 FROM cad_categoria WHERE id = ? LIMIT 1")
+    .get(Number(id));
+}
+
+function tipoExiste(id) {
+  const db = getDatabase();
+
+  return !!db
+    .prepare("SELECT 1 FROM cad_tipo WHERE id = ? LIMIT 1")
+    .get(Number(id));
+}
+
 module.exports = {
   listarAcervo,
   buscarAcervo,
@@ -267,4 +283,6 @@ module.exports = {
   listarAcervoComResumo,
   buscarLivroPorTitulo,
   upsertLivroPorTitulo,
+  categoriaExiste,
+  tipoExiste,
 };

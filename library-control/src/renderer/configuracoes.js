@@ -115,17 +115,38 @@ btnImportarAcervoCsv.addEventListener("click", async () => {
 
     hideLoadingModal();
 
-    await alertModal({
-      title: "Importação concluída",
-      message:
-        `Registros identificados: ${resultado.total}\n\n` +
-        `Criados: ${resultado.criados}\n` +
-        `Atualizados: ${resultado.atualizados}\n` +
-        `Ignorados: ${resultado.ignorados}\n\n` +
-        (resultado.erros?.length
-          ? `Erros:\n${resultado.erros.slice(0, 10).join("\n")}`
-          : "Sem erros."),
-    });
+    if (resultado.erros?.length) {
+      const exportar = await confirmModal({
+        title: "Importação concluída com erros",
+        message:
+          `Registros identificados: ${resultado.total}\n\n` +
+          `Criados: ${resultado.criados}\n` +
+          `Atualizados: ${resultado.atualizados}\n` +
+          `Ignorados: ${resultado.ignorados}\n\n` +
+          `Foram encontrados ${resultado.erros.length} erros.\n\n` +
+          `Deseja exportar os erros para CSV?`,
+      });
+
+      if (exportar) {
+        const res = await window.api.exportarErrosImportacao(resultado.erros);
+
+        if (!res?.canceled) {
+          await alertModal({
+            title: "Arquivo gerado",
+            message: `Erros exportados com sucesso em:\n${res.path}`,
+          });
+        }
+      }
+    } else {
+      await alertModal({
+        title: "Importação concluída",
+        message:
+          `Registros identificados: ${resultado.total}\n\n` +
+          `Criados: ${resultado.criados}\n` +
+          `Atualizados: ${resultado.atualizados}\n` +
+          `Ignorados: ${resultado.ignorados}`,
+      });
+    }
   } catch (error) {
     hideLoadingModal();
 
@@ -163,17 +184,38 @@ btnImportarUsuariosCsv.addEventListener("click", async () => {
 
     hideLoadingModal();
 
-    await alertModal({
-      title: "Importação concluída",
-      message:
-        `Registros identificados: ${resultado.total}\n\n` +
-        `Criados: ${resultado.criados}\n` +
-        `Atualizados: ${resultado.atualizados}\n` +
-        `Ignorados: ${resultado.ignorados}\n\n` +
-        (resultado.erros?.length
-          ? `Erros:\n${resultado.erros.slice(0, 10).join("\n")}`
-          : "Sem erros."),
-    });
+    if (resultado.erros?.length) {
+      const exportar = await confirmModal({
+        title: "Importação concluída com erros",
+        message:
+          `Registros identificados: ${resultado.total}\n\n` +
+          `Criados: ${resultado.criados}\n` +
+          `Atualizados: ${resultado.atualizados}\n` +
+          `Ignorados: ${resultado.ignorados}\n\n` +
+          `Foram encontrados ${resultado.erros.length} erros.\n\n` +
+          `Deseja exportar os erros para CSV?`,
+      });
+
+      if (exportar) {
+        const res = await window.api.exportarErrosImportacao(resultado.erros);
+
+        if (!res?.canceled) {
+          await alertModal({
+            title: "Arquivo gerado",
+            message: `Erros exportados com sucesso em:\n${res.path}`,
+          });
+        }
+      }
+    } else {
+      await alertModal({
+        title: "Importação concluída",
+        message:
+          `Registros identificados: ${resultado.total}\n\n` +
+          `Criados: ${resultado.criados}\n` +
+          `Atualizados: ${resultado.atualizados}\n` +
+          `Ignorados: ${resultado.ignorados}`,
+      });
+    }
   } catch (error) {
     hideLoadingModal();
 

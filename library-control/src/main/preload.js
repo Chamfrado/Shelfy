@@ -77,4 +77,7 @@ contextBridge.exposeInMainWorld("api", {
 
   confirmarImportarAcervoCsv: () =>
     ipcRenderer.invoke("importar:acervo-confirmar"),
+
+  exportarErrosImportacao: (erros) =>
+    ipcRenderer.invoke("importar:exportar-erros", erros),
 });
