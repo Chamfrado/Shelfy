@@ -38,6 +38,7 @@ document.getElementById("app").innerHTML = getLayout(
     <div class="form-box">
       <button id="btnFazerBackup">Fazer backup do banco</button>
       <button id="btnRestaurarBackup">Restaurar backup</button>
+      <button id="btnAbrirBackups">Abrir pasta de backups</button>
     </div>
 
     <div class="status-box">
@@ -76,6 +77,8 @@ const btnImportarUsuariosCsv = document.getElementById(
 
 const btnImportarAcervoCsv = document.getElementById("btnImportarAcervoCsv");
 
+const btnAbrirBackups = document.getElementById("btnAbrirBackups");
+
 window.api.onImportProgress(({ tipo, atual, total }) => {
   const percentual = total > 0 ? Math.round((atual / total) * 100) : 0;
 
@@ -84,6 +87,17 @@ window.api.onImportProgress(({ tipo, atual, total }) => {
   updateLoadingModal(
     `Importando ${nome}...\n${percentual}% — ${atual} de ${total}`,
   );
+});
+
+btnAbrirBackups.addEventListener("click", async () => {
+  try {
+    await window.api.abrirPastaBackups();
+  } catch (error) {
+    await alertModal({
+      title: "Erro",
+      message: error.message,
+    });
+  }
 });
 
 btnImportarAcervoCsv.addEventListener("click", async () => {

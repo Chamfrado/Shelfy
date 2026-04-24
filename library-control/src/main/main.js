@@ -5,6 +5,7 @@ const {
   dialog,
   protocol,
   net,
+  shell,
 } = require("electron");
 const path = require("node:path");
 const PDFDocument = require("pdfkit");
@@ -317,6 +318,54 @@ function migrarImagensAntigas() {
   });
 }
 
+function getBackupsDir() {
+  return path.join(app.getPath("userData"), "backups");
+}
+
+function fazerBackupAutomatico() {
+  try {
+    const dbPath = getDatabasePath();
+
+    if (!fs.existsSync(dbPath)) return;
+
+    const backupDir = getBackupsDir();
+
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
+
+    const agora = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+
+    const nomeArquivo =
+      `backup-auto-${agora.getFullYear()}-${pad(agora.getMonth() + 1)}-${pad(agora.getDate())}_` +
+      `${pad(agora.getHours())}-${pad(agora.getMinutes())}-${pad(agora.getSeconds())}.db`;
+
+    const destino = path.join(backupDir, nomeArquivo);
+
+    closeDatabase();
+    fs.copyFileSync(dbPath, destino);
+
+    const backups = fs
+      .readdirSync(backupDir)
+      .filter((file) => file.endsWith(".db"))
+      .map((file) => ({
+        file,
+        path: path.join(backupDir, file),
+        time: fs.statSync(path.join(backupDir, file)).mtimeMs,
+      }))
+      .sort((a, b) => b.time - a.time);
+
+    backups.slice(5).forEach((backup) => {
+      fs.unlinkSync(backup.path);
+    });
+
+    console.log("Backup automático criado:", destino);
+  } catch (error) {
+    console.error("Erro no backup automático:", error);
+  }
+}
+
 app.whenReady().then(() => {
   garantirPastaImagensLivros();
   migrarImagensAntigas();
@@ -332,6 +381,18 @@ app.whenReady().then(() => {
     }
 
     return net.fetch(pathToFileURL(caminho).toString());
+  });
+
+  ipcMain.handle("backup:abrir-pasta", () => {
+    const dir = getBackupsDir();
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    shell.openPath(dir);
+
+    return true;
   });
 
   ipcMain.handle("acervo:listar", () => {
@@ -1074,4 +1135,8 @@ app.whenReady().then(() => {
   });
 
   createWindow();
+});
+
+app.on("before-quit", () => {
+  fazerBackupAutomatico();
 });

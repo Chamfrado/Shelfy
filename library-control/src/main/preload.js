@@ -80,4 +80,6 @@ contextBridge.exposeInMainWorld("api", {
 
   exportarErrosImportacao: (erros) =>
     ipcRenderer.invoke("importar:exportar-erros", erros),
+
+  abrirPastaBackups: () => ipcRenderer.invoke("backup:abrir-pasta"),
 });
