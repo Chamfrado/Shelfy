@@ -841,3 +841,81 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-field input,
+.form-field select,
+.modern-toolbar input,
+.modern-toolbar select {
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  outline: none;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.modern-toolbar input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.btn-light {
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-weight: 600;
+}
+
+.btn-light:hover {
+  background: #eef2ff;
+  border-color: #bfdbfe;
+}
+
+.badge-admin {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.badge-aluno {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-operador {
+  background: #dbeafe;
+  color: #1e40af;
+}

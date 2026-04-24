@@ -1,56 +1,85 @@
 document.getElementById("app").innerHTML = getLayout(
   "usuarios",
   `
-    <h2>Usuários</h2>
+  <div class="page-header">
+    <div>
+      <h1>Usuários</h1>
+      <p>Cadastre, edite e acompanhe o histórico dos usuários.</p>
+    </div>
+  </div>
 
-    <h3>Cadastrar usuário</h3>
-
-    <div class="form-box">
-      <label for="usuarioNome">Nome</label>
-      <input id="usuarioNome" placeholder="Nome" />
-
-      <label for="usuarioLogin">Login</label>
-      <input id="usuarioLogin" placeholder="Login" />
-
-      <label for="usuarioNivel">Nível do usuário</label>
-      <select id="usuarioNivel">
-        <option value="">Selecione o nível</option>
-        <option value="1">1 - Administrador</option>
-        <option value="2">2 - Aluno</option>
-        <option value="3">3 - Operador</option>
-      </select>
-
-      <small class="hint">
-        Se você ainda não souber o significado exato, use o mesmo padrão do sistema antigo.
-      </small>
-
-      <label for="usuarioTurma">Turma</label>
-      <input id="usuarioTurma" placeholder="Turma" />
-
-      <label for="usuarioFone">Telefone</label>
-      <input id="usuarioFone" placeholder="Telefone" />
-
-      <label for="usuarioEmail">E-mail</label>
-      <input id="usuarioEmail" placeholder="E-mail" />
-
-      <div class="acoes-formulario">
-        <button id="btnSalvarUsuario">Salvar usuário</button>
-        <button id="btnCancelarEdicaoUsuario" type="button" class="hidden">Cancelar edição</button>
-        <button id="btnLimparUsuario" type="button">Limpar formulário</button>
+  <section class="page-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2 id="tituloFormularioUsuario">Cadastrar usuário</h2>
+          <p>Preencha os dados básicos do usuário.</p>
+        </div>
       </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="usuarioNome">Nome</label>
+          <input id="usuarioNome" placeholder="Nome completo" />
+        </div>
+
+        <div class="form-field">
+          <label for="usuarioLogin">Login</label>
+          <input id="usuarioLogin" placeholder="login.usuario" />
+        </div>
+
+        <div class="form-field">
+          <label for="usuarioNivel">Nível</label>
+          <select id="usuarioNivel">
+            <option value="">Selecione o nível</option>
+            <option value="1">Administrador</option>
+            <option value="2">Aluno</option>
+            <option value="3">Operador</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="usuarioTurma">Turma</label>
+          <input id="usuarioTurma" placeholder="Ex.: 1A" />
+        </div>
+
+        <div class="form-field">
+          <label for="usuarioFone">Telefone</label>
+          <input id="usuarioFone" placeholder="(35) 99999-9999" />
+        </div>
+
+        <div class="form-field">
+          <label for="usuarioEmail">E-mail</label>
+          <input id="usuarioEmail" placeholder="usuario@email.com" />
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button id="btnSalvarUsuario" class="btn-primary">Salvar usuário</button>
+        <button id="btnCancelarEdicaoUsuario" type="button" class="btn-secondary hidden">Cancelar edição</button>
+        <button id="btnLimparUsuario" type="button" class="btn-light">Limpar</button>
+      </div>
+
+      <div id="statusUsuario" class="status-box"></div>
     </div>
 
-    <div id="statusUsuario" class="status-box"></div>
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Buscar usuários</h2>
+          <p>Pesquise por nome ou login.</p>
+        </div>
+      </div>
 
-    <hr />
+      <div class="toolbar modern-toolbar">
+        <input id="buscaUsuario" placeholder="Buscar usuário..." />
+        <button id="btnBuscarUsuario" class="btn-primary">Buscar</button>
+      </div>
 
-    <div class="toolbar">
-      <input id="buscaUsuario" placeholder="Buscar usuário por nome..." />
-      <button id="btnBuscarUsuario">Buscar usuário</button>
+      <div id="resultadoUsuarios"></div>
     </div>
-
-    <div id="resultadoUsuarios"></div>
-  `,
+  </section>
+`,
 );
 
 const usuarioNome = document.getElementById("usuarioNome");
@@ -64,6 +93,9 @@ const statusUsuario = document.getElementById("statusUsuario");
 const inputBuscaUsuario = document.getElementById("buscaUsuario");
 const btnBuscarUsuario = document.getElementById("btnBuscarUsuario");
 const resultadoUsuariosEl = document.getElementById("resultadoUsuarios");
+const tituloFormularioUsuario = document.getElementById(
+  "tituloFormularioUsuario",
+);
 
 const btnCancelarEdicaoUsuario = document.getElementById(
   "btnCancelarEdicaoUsuario",
@@ -88,14 +120,15 @@ function limparFormulario() {
   statusUsuario.className = "status-box";
   statusUsuario.textContent = "";
 }
-
 function atualizarEstadoEdicaoUsuario() {
   if (usuarioEmEdicaoId) {
     btnCancelarEdicaoUsuario.classList.remove("hidden");
     btnSalvarUsuario.textContent = "Atualizar usuário";
+    tituloFormularioUsuario.textContent = "Editar usuário";
   } else {
     btnCancelarEdicaoUsuario.classList.add("hidden");
     btnSalvarUsuario.textContent = "Salvar usuário";
+    tituloFormularioUsuario.textContent = "Cadastrar usuário";
   }
 }
 
@@ -184,7 +217,8 @@ async function abrirHistoricoUsuario(usuarioId) {
 function renderUsuarios(lista) {
   resultadoUsuariosEl.innerHTML = `
     <h2>Usuários - Total: ${lista.length}</h2>
-    <table>
+   <div class="table-wrapper">
+      <table class="modern-table">
       <tr>
         <th>Nome</th>
         <th>Login</th>
@@ -200,20 +234,21 @@ function renderUsuarios(lista) {
             <tr>
               <td>${usuario.nome ?? ""}</td>
               <td>${usuario.login ?? ""}</td>
-              <td>${usuario.nivel ?? ""}</td>
+              <td>${renderNivelUsuario(usuario.nivel)}</td>
               <td>${usuario.turma ?? ""}</td>
               <td>${usuario.fone ?? ""}</td>
               <td>${usuario.email ?? ""}</td>
               <td>
-                <button class="btn-historico-usuario" data-id="${usuario.id}">Histórico</button>
-                <button class="btn-editar-usuario" data-id="${usuario.id}">Editar</button>
-                <button class="btn-excluir-usuario" data-id="${usuario.id}">Excluir</button>
+                <button class="btn-light btn-historico-usuario" data-id="${usuario.id}">Histórico</button>
+                <button class="btn-light btn-editar-usuario" data-id="${usuario.id}">Editar</button>
+                <button class="btn-danger btn-excluir-usuario" data-id="${usuario.id}">Excluir</button>
               </td>
             </tr>
           `,
         )
         .join("")}
     </table>
+  </div>
   `;
 
   document.querySelectorAll(".btn-historico-usuario").forEach((btn) => {
@@ -292,6 +327,17 @@ async function carregarUsuarios() {
   listaUsuariosAtual = usuarios;
 
   renderUsuarios(usuarios);
+}
+
+function renderNivelUsuario(nivel) {
+  const n = Number(nivel);
+
+  if (n === 1) return `<span class="badge-status badge-admin">Admin</span>`;
+  if (n === 2) return `<span class="badge-status badge-aluno">Aluno</span>`;
+  if (n === 3)
+    return `<span class="badge-status badge-operador">Operador</span>`;
+
+  return `<span class="badge-status badge-suave">-</span>`;
 }
 
 btnSalvarUsuario.addEventListener("click", async () => {
