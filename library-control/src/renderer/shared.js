@@ -1,38 +1,41 @@
 function getLayout(active, content) {
   return `
     <div class="app">
-      
-      <!-- SIDEBAR -->
       <aside class="sidebar">
-        <div class="sidebar-header">
-          <h2>📚 Library</h2>
+        <div class="sidebar-brand">
+          <div class="brand-icon">📚</div>
+          <div>
+            <strong>Bibliotecário</strong>
+            <span>Desktop</span>
+          </div>
         </div>
 
         <nav class="sidebar-nav">
-          ${navLink("dashboard", "Dashboard", "dashboard")}
-          ${navLink("usuarios", "Users", "users")}
-          ${navLink("acervo", "Acervo", "books")}
-          ${navLink("emprestimos", "Loans", "loans")}
-          ${navLink("inadimplentes", "Inadimplentes", "alert")}
-          ${navLink("configuracoes", "Settings", "settings")}
-          ${navLink("creditos", "Credits", "user")}
+          ${navLink("dashboard", "Dashboard", "📊")}
+          ${navLink("usuarios", "Usuários", "👤")}
+          ${navLink("acervo", "Acervo", "📚")}
+          ${navLink("emprestimos", "Empréstimos", "🔁")}
+          ${navLink("inadimplentes", "Inadimplentes", "⚠️")}
+          ${navLink("configuracoes", "Configurações", "⚙️")}
+          ${navLink("creditos", "Créditos", "✨")}
         </nav>
+
+        <div class="sidebar-footer">
+          <span>Chamfrado's Solutions</span>
+        </div>
       </aside>
 
-      <!-- MAIN -->
       <main class="main">
-
-        <!-- TOPBAR -->
         <header class="topbar">
-          <input class="search" placeholder="Search users, books or loans..." />
-          <div class="user">Admin</div>
+          <div>
+            <strong>Bibliotecário Desktop</strong>
+            <span>Sistema de controle de biblioteca</span>
+          </div>
         </header>
 
-        <!-- CONTENT -->
         <section class="content">
           ${content}
         </section>
-
       </main>
     </div>
   `;
@@ -49,6 +52,7 @@ function navLink(page, label, icon) {
 
   return `
     <a class="nav-item ${isActive ? "active" : ""}" href="${href}">
+      <span class="nav-icon">${icon}</span>
       <span>${label}</span>
     </a>
   `;

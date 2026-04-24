@@ -1041,3 +1041,189 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: #f3f6fb;
+}
+
+.sidebar {
+  width: 260px;
+  background: #0f172a;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.sidebar-brand strong {
+  display: block;
+  font-size: 18px;
+}
+
+.sidebar-brand span {
+  display: block;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 11px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.nav-item:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.nav-item.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.nav-icon {
+  width: 22px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 26px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.topbar strong {
+  display: block;
+  color: #0f172a;
+}
+
+.topbar span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.content {
+  padding: 26px;
+  overflow-y: auto;
+}
+
+.creditos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.creditos-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.creditos-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.creditos-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.creditos-role {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.creditos-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.creditos-info span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.creditos-info strong {
+  display: block;
+  color: #0f172a;
+}
+
+.creditos-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.creditos-about {
+  color: #475569;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .creditos-grid {
+    grid-template-columns: 1fr;
+  }
+}
