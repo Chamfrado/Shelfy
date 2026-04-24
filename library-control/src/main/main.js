@@ -196,7 +196,10 @@ function parseCsvConteudo(conteudo) {
     throw new Error("O arquivo não possui registros para importação.");
   }
 
-  const cabecalho = linhas[0].split(";").map((c) => c.trim());
+  const cabecalho = linhas[0]
+    .replace(/^\uFEFF/, "")
+    .split(";")
+    .map((c) => c.trim());
   const registros = linhas.slice(1).map((linha) => {
     const valores = linha.split(";").map((v) => v.trim());
 
@@ -684,16 +687,16 @@ app.whenReady().then(() => {
 
   ipcMain.handle("modelo:baixar-acervo", async () => {
     const conteudo = [
-      "# MODELO DE IMPORTACAO - ACERVO",
-      "# Preencha os dados abaixo mantendo o cabecalho exatamente igual.",
+      "# MODELO DE IMPORTAÇÃO - ACERVO",
+      "# Preencha os dados abaixo mantendo o cabeçalho exatamente igual.",
       "#",
-      "# Campos obrigatorios: titulo, quantidade, categoria, tipo",
+      "# Campos obrigatórios: título, quantidade, categoria, tipo",
       "#",
       "# TIPO DO ACERVO:",
       "# 1 = LIVRO",
       "# 3 = APOSTILA",
-      "# 4 = COLECAO",
-      "# 5 = ENCICLOPEDIA E DICIONARIOS",
+      "# 4 = COLEÇÃO",
+      "# 5 = ENCICLOPÉDIA E DICIONÁRIOS",
       "# 6 = REVISTA",
       "# 7 = JORNAL",
       "# 8 = GIBI",
@@ -701,7 +704,6 @@ app.whenReady().then(() => {
       "# CATEGORIA:",
       "# Use o número correspondente à categoria cadastrada no sistema.",
       "# Exemplo: 1 = LINGUA PORTUGUESA, 2 = GEOGRAFIA, etc. (Consulte as opções no sistema Acervo -> cadastrar livro)",
-      ,
       "#",
       "titulo;autor;editora;isbn;quantidade;categoria;tipo",
       "Exemplo de Livro;Autor Exemplo;Editora Exemplo;9780000000000;3;1;1",
@@ -717,7 +719,7 @@ app.whenReady().then(() => {
       return { canceled: true };
     }
 
-    fs.writeFileSync(result.filePath, conteudo, "utf8");
+    fs.writeFileSync(result.filePath, "\uFEFF" + conteudo, "utf8");
 
     return {
       canceled: false,
@@ -727,12 +729,12 @@ app.whenReady().then(() => {
 
   ipcMain.handle("modelo:baixar-usuarios", async () => {
     const conteudo = [
-      "# MODELO DE IMPORTACAO - USUARIOS",
+      "# MODELO DE IMPORTAÇÃO - USUÁRIOS",
       "# Preencha os dados abaixo mantendo o cabecalho exatamente igual.",
       "#",
-      "# Campos obrigatórios: nome, login, nivel",
+      "# Campos obrigatórios: nome, login, nível",
       "#",
-      "# NIVEL DO USUARIO:",
+      "# NIVEL DO USUÁRIO:",
       "# 1 = Administrador",
       "# 2 = Aluno",
       "# 3 = Operador",
@@ -751,7 +753,7 @@ app.whenReady().then(() => {
       return { canceled: true };
     }
 
-    fs.writeFileSync(result.filePath, conteudo, "utf8");
+    fs.writeFileSync(result.filePath, "\uFEFF" + conteudo, "utf8");
 
     return {
       canceled: false,
