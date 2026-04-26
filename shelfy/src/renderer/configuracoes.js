@@ -147,30 +147,23 @@ document.getElementById("app").innerHTML = getLayout(
 
 aplicarConfiguracaoInstituicao();
 
-const btnFazerBackup = document.getElementById("btnFazerBackup");
+const btnFazerBackup = document.getElementById("btnBackup");
 const btnRestaurarBackup = document.getElementById("btnRestaurarBackup");
 
-const btnExportarAcervoCsv = document.getElementById("btnExportarAcervoCsv");
-const btnExportarUsuariosCsv = document.getElementById(
-  "btnExportarUsuariosCsv",
-);
+const btnExportarAcervoCsv = document.getElementById("btnExportarAcervo");
+const btnExportarUsuariosCsv = document.getElementById("btnExportarUsuarios");
 const btnExportarEmprestimosCsv = document.getElementById(
-  "btnExportarEmprestimosCsv",
+  "btnExportarEmprestimos",
 );
 const btnExportarEmprestimosPdf = document.getElementById(
   "btnExportarEmprestimosPdf",
 );
 
-const btnBaixarModeloAcervo = document.getElementById("btnBaixarModeloAcervo");
-const btnBaixarModeloUsuarios = document.getElementById(
-  "btnBaixarModeloUsuarios",
-);
+const btnBaixarModeloAcervo = document.getElementById("btnModeloAcervo");
+const btnBaixarModeloUsuarios = document.getElementById("btnModeloUsuarios");
 
-const btnImportarUsuariosCsv = document.getElementById(
-  "btnImportarUsuariosCsv",
-);
-
-const btnImportarAcervoCsv = document.getElementById("btnImportarAcervoCsv");
+const btnImportarUsuariosCsv = document.getElementById("btnImportarUsuarios");
+const btnImportarAcervoCsv = document.getElementById("btnImportarAcervo");
 
 const btnAbrirBackups = document.getElementById("btnAbrirBackups");
 

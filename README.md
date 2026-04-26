@@ -72,39 +72,46 @@ A escolha reforça o conceito **offline-first**. O Shelfy opera inteiramente no 
 ## 🚀 Funcionalidades principais
 
 ### Acervo
+
 - cadastro de livros com capa
 - categorias e tipos configuráveis
 - controle de quantidade em estoque
 - histórico completo por livro
 
 ### Usuários
+
 - cadastro completo de usuários
 - níveis de acesso: **Admin**, **Aluno**, **Operador**
 - histórico de empréstimos por usuário
 
 ### Empréstimos
+
 - registro rápido de retirada
 - controle automático de estoque
 - devolução com um clique
 - bloqueio automático de usuários com atraso
 
 ### Inadimplentes
+
 - lista automática de atrasos
 - cálculo de dias em atraso
 - exportação em PDF
 
 ### Relatórios
+
 - exportação em CSV
 - relatório de empréstimos em PDF
 - relatório de inadimplentes em PDF
 
 ### Importação
+
 - importação de dados via CSV
 - validação completa de campos
 - atualização automática (upsert)
 - relatório de erros para correção rápida
 
 ### Backup
+
 - backup manual seguro
 - backup automático ao fechar o sistema
 - restauração simples do banco local
