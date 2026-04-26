@@ -340,6 +340,32 @@ function validarCabecalho(cabecalho, esperado) {
   }
 }
 
+function toCsv(dados) {
+  if (!Array.isArray(dados) || dados.length === 0) {
+    return "";
+  }
+
+  const colunas = Object.keys(dados[0]);
+  const linhas = [colunas.join(";")];
+
+  dados.forEach((item) => {
+    const valores = colunas.map((coluna) => {
+      const valor = item[coluna] ?? "";
+      const texto = String(valor).replace(/"/g, '""');
+
+      if (texto.includes(";") || texto.includes('"') || texto.includes("\n")) {
+        return `"${texto}"`;
+      }
+
+      return texto;
+    });
+
+    linhas.push(valores.join(";"));
+  });
+
+  return linhas.join("\r\n");
+}
+
 function analisarUsuariosCsv(arquivo) {
   const conteudo = fs.readFileSync(arquivo, "utf8");
   const { cabecalho, registros } = parseCsvConteudo(conteudo);
