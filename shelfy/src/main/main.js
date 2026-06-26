@@ -151,6 +151,7 @@ function gerarPdfEmprestimos(dados, destino) {
     doc.moveDown();
 
     const agora = new Date();
+
     doc
       .fontSize(10)
       .text(`Gerado em: ${agora.toLocaleString("pt-BR")}`, { align: "right" });
@@ -159,26 +160,41 @@ function gerarPdfEmprestimos(dados, destino) {
 
     let y = doc.y;
 
-    function escreverLinha(col1, col2, col3, col4, col5, isHeader = false) {
-      const fontSize = isHeader ? 10 : 9;
-      if (y > 760) {
+    function escreverLinha(
+      aluno,
+      turma,
+      livro,
+      emprestimo,
+      devolucao,
+      status,
+      isHeader = false,
+    ) {
+      if (y > 730) {
         doc.addPage();
         y = 50;
       }
 
-      doc.fontSize(fontSize).font(isHeader ? "Helvetica-Bold" : "Helvetica");
+      doc.font(isHeader ? "Helvetica-Bold" : "Helvetica");
+      doc.fontSize(isHeader ? 10 : 8);
 
-      doc.text(col1, 40, y, { width: 120 });
-      doc.text(col2, 165, y, { width: 140 });
-      doc.text(col3, 310, y, { width: 70 });
-      doc.text(col4, 385, y, { width: 70 });
-      doc.text(col5, 460, y, { width: 90 });
+      const options = {
+        height: 32,
+        ellipsis: true,
+      };
 
-      y += isHeader ? 22 : 20;
+      doc.text(aluno, 40, y, { width: 95, ...options });
+      doc.text(turma, 140, y, { width: 45, ...options });
+      doc.text(livro, 190, y, { width: 145, ...options });
+      doc.text(emprestimo, 340, y, { width: 65, ...options });
+      doc.text(devolucao, 410, y, { width: 65, ...options });
+      doc.text(status, 480, y, { width: 75, ...options });
+
+      y += isHeader ? 24 : 36;
     }
 
     escreverLinha(
-      "Usuário",
+      "Aluno",
+      "Turma",
       "Livro",
       "Empréstimo",
       "Devolução",
@@ -194,6 +210,7 @@ function gerarPdfEmprestimos(dados, destino) {
         .includes("sim");
 
       const hoje = new Date().toISOString().slice(0, 10);
+
       const atrasado =
         !devolvido && item.data_devolucao && item.data_devolucao < hoje;
 
@@ -201,6 +218,7 @@ function gerarPdfEmprestimos(dados, destino) {
 
       escreverLinha(
         item.usuario ?? "",
+        item.turma ?? "-",
         item.livro ?? "",
         item.data_atual ?? "",
         item.data_devolucao ?? "",
@@ -253,10 +271,11 @@ function gerarPdfInadimplentes(dados, destino) {
     let y = doc.y;
 
     function escreverLinha(
-      usuario,
+      aluno,
+      turma,
       livro,
       emprestimo,
-      devolucao,
+      limite,
       atraso,
       header = false,
     ) {
@@ -273,22 +292,32 @@ function gerarPdfInadimplentes(dados, destino) {
         ellipsis: true,
       };
 
-      doc.text(usuario, 40, y, { width: 105, ...options });
-      doc.text(livro, 150, y, { width: 150, ...options });
-      doc.text(emprestimo, 305, y, { width: 75, ...options });
-      doc.text(devolucao, 385, y, { width: 75, ...options });
-      doc.text(atraso, 465, y, { width: 85, ...options });
+      doc.text(aluno, 40, y, { width: 95, ...options });
+      doc.text(turma, 140, y, { width: 45, ...options });
+      doc.text(livro, 190, y, { width: 145, ...options });
+      doc.text(emprestimo, 340, y, { width: 65, ...options });
+      doc.text(limite, 410, y, { width: 65, ...options });
+      doc.text(atraso, 480, y, { width: 75, ...options });
 
       y += header ? 24 : 36;
     }
 
-    escreverLinha("Usuário", "Livro", "Empréstimo", "Limite", "Atraso", true);
+    escreverLinha(
+      "Aluno",
+      "Turma",
+      "Livro",
+      "Empréstimo",
+      "Limite",
+      "Atraso",
+      true,
+    );
 
     dados.forEach((item) => {
       const dias = calcularDiasAtraso(item.data_devolucao);
 
       escreverLinha(
         item.usuario ?? "",
+        item.turma ?? "-",
         item.livro ?? "",
         item.data_atual ?? "",
         item.data_devolucao ?? "",

@@ -3,12 +3,16 @@ const { getDatabase } = require("./connection");
 function listarEmprestimos() {
   const db = getDatabase();
 
-  const stmt = db.prepare(`
+  function listarEmprestimos() {
+    const db = getDatabase();
+
+    const stmt = db.prepare(`
     SELECT
       e.id,
       e.user_id,
       e.acervo_id,
       u.nome AS usuario,
+      u.turma AS turma,
       a.titulo AS livro,
       e.total_dias,
       e.data_atual,
@@ -22,6 +26,9 @@ function listarEmprestimos() {
     ORDER BY e.id DESC
   `);
 
+    return stmt.all();
+  }
+
   return stmt.all();
 }
 
@@ -34,6 +41,7 @@ function listarEmprestimosAtrasados() {
       e.user_id,
       e.acervo_id,
       u.nome AS usuario,
+      u.turma AS turma,
       a.titulo AS livro,
       e.total_dias,
       e.data_atual,
@@ -46,7 +54,7 @@ function listarEmprestimosAtrasados() {
     JOIN cad_acervo a ON a.id = e.acervo_id
     WHERE lower(e.devolvido) NOT LIKE '%sim%'
       AND date(e.data_devolucao) < date('now', 'localtime')
-    ORDER BY e.data_devolucao ASC
+    ORDER BY u.turma COLLATE NOCASE ASC, u.nome COLLATE NOCASE ASC
   `);
 
   return stmt.all();
@@ -228,6 +236,7 @@ function buscarEmprestimos(termo, status) {
       e.user_id,
       e.acervo_id,
       u.nome AS usuario,
+      u.turma AS turma,
       a.titulo AS livro,
       e.total_dias,
       e.data_atual,
@@ -244,8 +253,8 @@ function buscarEmprestimos(termo, status) {
   const params = [];
 
   if (termo) {
-    sql += ` AND (u.nome LIKE ? OR a.titulo LIKE ?)`;
-    params.push(`%${termo}%`, `%${termo}%`);
+    sql += ` AND (u.nome LIKE ? OR u.turma LIKE ? OR a.titulo LIKE ?)`;
+    params.push(`%${termo}%`, `%${termo}%`, `%${termo}%`);
   }
 
   if (status === "ativos") {

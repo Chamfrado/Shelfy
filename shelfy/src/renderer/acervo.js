@@ -181,6 +181,7 @@ function renderAcervo(lista) {
    <div class="table-wrapper">
     <table class="modern-table">
       <tr>
+        <th>ID</th>
         <th>Capa</th>
         <th>Título</th>
         <th>Autor</th>
@@ -198,6 +199,7 @@ function renderAcervo(lista) {
 
           return `
           <tr>
+          <td>${l.id ?? ""}</td>
             <td>
              <img
   src="${getCapaLivroUrl(l.capa)}"
